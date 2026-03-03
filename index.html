@@ -3,528 +3,665 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>AncestralIA — Mapa Cabalístico</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;500;700&display=swap" rel="stylesheet">
+<title>AncestralIA — Mapa da Alma</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Cinzel:wght@400;500;600&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 <style>
 :root {
   --gold: #C9A84C;
   --gold-light: #E8C97A;
-  --gold-dim: #7A6028;
-  --bg: #06060A;
-  --bg2: #0D0C12;
-  --bg3: #13121A;
-  --text: #EAE0CC;
-  --text-dim: #7A7060;
-  --text-mid: #B0A080;
-  --border: rgba(201,168,76,0.15);
-  --border-bright: rgba(201,168,76,0.4);
-  --red: #C04040;
-  --green: #4A8C5C;
+  --gold-dim: #6B5420;
+  --gold-glow: rgba(201,168,76,0.15);
+  --bg: #050508;
+  --bg2: #0A090F;
+  --bg3: #100F18;
+  --bg4: #16141F;
+  --text: #E8DCC8;
+  --text-dim: #6B6050;
+  --text-mid: #A89870;
+  --border: rgba(201,168,76,0.12);
+  --border-bright: rgba(201,168,76,0.35);
+  --red: #8B3030;
+  --red-light: #C04848;
+  --green: #2D6B45;
+  --green-light: #4A9B6A;
+  --purple: #3D2B6B;
+  --purple-light: #7B5BCA;
 }
+
 * { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
+
 body {
   background: var(--bg);
   color: var(--text);
   font-family: 'Cormorant Garamond', serif;
-  font-size: 19px;
-  line-height: 1.85;
+  font-size: 18px;
+  line-height: 1.9;
   min-height: 100vh;
   overflow-x: hidden;
 }
+
+/* Atmospheric background */
 body::before {
-  content:'';
-  position:fixed; inset:0;
+  content: '';
+  position: fixed;
+  inset: 0;
   background:
-    radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 85% 8%, rgba(255,255,255,0.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 45% 65%, rgba(255,255,255,0.3) 0%, transparent 100%),
-    radial-gradient(2px 2px at 90% 55%, rgba(201,168,76,0.4) 0%, transparent 100%),
-    radial-gradient(2px 2px at 5% 45%, rgba(201,168,76,0.3) 0%, transparent 100%);
-  pointer-events:none; z-index:0;
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201,168,76,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 90% 80%, rgba(61,43,107,0.06) 0%, transparent 50%),
+    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 15%, rgba(255,255,255,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 70%, rgba(255,255,255,0.25) 0%, transparent 100%),
+    radial-gradient(2px 2px at 85% 45%, rgba(201,168,76,0.35) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .screen { display:none; min-height:100vh; position:relative; z-index:1; flex-direction:column; }
 .screen.active { display:flex; }
 
-/* ── SHARED ── */
-.gold { color:var(--gold); }
-.eyebrow { font-size:11px; letter-spacing:5px; text-transform:uppercase; color:var(--gold-dim); margin-bottom:10px; }
-.section-title { font-family:'Cinzel',serif; font-size:20px; color:var(--gold); margin-bottom:24px; letter-spacing:2px; }
-.divider { text-align:center; margin:28px 0; color:var(--gold-dim); font-size:16px; letter-spacing:10px; }
-.long-text { font-size:18px; line-height:1.95; color:var(--text); font-weight:300; }
-.long-text p { margin-bottom:20px; }
-.long-text p:first-child::first-letter {
-  font-family:'Cinzel',serif; font-size:50px; float:left;
-  line-height:0.85; margin:8px 10px 0 0; color:var(--gold);
-}
-.btn {
-  background: linear-gradient(135deg, #5C3D0A, var(--gold), #E8C97A);
-  color:#000; border:none; padding:19px 0; width:100%; max-width:360px;
-  font-family:'Cinzel',serif; font-size:13px; letter-spacing:4px; cursor:pointer;
-  transition:all 0.4s; position:relative; overflow:hidden;
-  clip-path:polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
-}
-.btn::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent); transition:left 0.6s; }
-.btn:hover::before { left:100%; }
-.btn:hover { transform:translateY(-3px); box-shadow:0 10px 40px rgba(201,168,76,0.35); }
-.fade-in { animation:fadeUp 0.7s ease forwards; opacity:0; transform:translateY(16px); }
-@keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
-.d1{animation-delay:.1s} .d2{animation-delay:.25s} .d3{animation-delay:.4s}
-.d4{animation-delay:.55s} .d5{animation-delay:.7s} .d6{animation-delay:.85s}
+/* ── ANIMATIONS ── */
 @keyframes breathe {
-  0%,100%{filter:drop-shadow(0 0 10px rgba(201,168,76,0.3));transform:scale(1)}
-  50%{filter:drop-shadow(0 0 28px rgba(201,168,76,0.7));transform:scale(1.06)}
+  0%,100%{filter:drop-shadow(0 0 12px rgba(201,168,76,0.25));transform:scale(1)}
+  50%{filter:drop-shadow(0 0 32px rgba(201,168,76,0.6));transform:scale(1.04)}
 }
 @keyframes spin { to{transform:rotate(360deg)} }
+@keyframes fadeUp { to{opacity:1;transform:translateY(0)} }
 @keyframes grow { from{width:0 !important} }
+@keyframes pulse-border {
+  0%,100%{border-color:rgba(201,168,76,0.15)}
+  50%{border-color:rgba(201,168,76,0.4)}
+}
+@keyframes shimmer {
+  0%{background-position:-200% 0}
+  100%{background-position:200% 0}
+}
 
-/* ══ INTRO ══ */
-#s-intro { align-items:center; justify-content:center; padding:60px 28px; text-align:center; }
-.eye-wrap { width:110px; height:110px; margin:0 auto 40px; animation:breathe 5s ease-in-out infinite; }
-.brand { font-family:'Cinzel',serif; font-size:36px; font-weight:500; letter-spacing:8px; color:var(--gold); margin-bottom:6px; }
-.brand-sub { font-size:11px; letter-spacing:5px; color:var(--text-dim); text-transform:uppercase; margin-bottom:52px; }
-.hr-gold { width:80px; height:1px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:0 auto 52px; }
-.intro-quote { font-size:20px; font-style:italic; font-weight:300; color:var(--text-mid); line-height:1.9; max-width:340px; margin-bottom:52px; }
-.intro-quote em { color:var(--gold-light); font-style:normal; }
-.trust { margin-top:18px; font-size:13px; color:var(--text-dim); letter-spacing:1px; }
+.fade-in { animation:fadeUp 0.8s ease forwards; opacity:0; transform:translateY(20px); }
+.d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.35s}
+.d4{animation-delay:.5s}.d5{animation-delay:.65s}.d6{animation-delay:.8s}
 
-/* ══ FORM ══ */
+/* ── SHARED COMPONENTS ── */
+.eyebrow {
+  font-family:'Inter',sans-serif;
+  font-size:10px; letter-spacing:5px;
+  text-transform:uppercase; color:var(--gold-dim);
+  margin-bottom:10px;
+}
+
+.section-title {
+  font-family:'Cinzel',serif;
+  font-size:19px; color:var(--gold);
+  letter-spacing:2px; margin-bottom:20px;
+  line-height:1.4;
+}
+
+.divider {
+  display:flex; align-items:center; gap:16px;
+  margin:32px 0; opacity:0.4;
+}
+.divider::before,.divider::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+}
+.divider span { color:var(--gold); font-size:12px; }
+
+.long-text { font-size:17px; line-height:2; color:var(--text); font-weight:300; }
+.long-text p { margin-bottom:22px; }
+.long-text p:first-child::first-letter {
+  font-family:'Cinzel',serif; font-size:48px;
+  float:left; line-height:0.82; margin:10px 12px 0 0; color:var(--gold);
+}
+
+.btn-primary {
+  background:linear-gradient(135deg, #3D2800, var(--gold) 50%, #E8C97A);
+  color:#000; border:none;
+  padding:18px 0; width:100%; max-width:360px;
+  font-family:'Cinzel',serif; font-size:12px; letter-spacing:5px;
+  cursor:pointer; transition:all 0.4s; position:relative; overflow:hidden;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  font-weight:600;
+}
+.btn-primary::before {
+  content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+  transition:left 0.7s;
+}
+.btn-primary:hover::before{left:100%}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 48px rgba(201,168,76,0.3)}
+
+/* ── SCREEN 1: INTRO ── */
+#s-intro {
+  align-items:center; justify-content:center;
+  padding:60px 28px; text-align:center;
+  min-height:100vh;
+}
+
+.sigil-wrap {
+  width:120px; height:120px;
+  margin:0 auto 44px;
+  animation:breathe 6s ease-in-out infinite;
+}
+
+.brand {
+  font-family:'Cinzel',serif;
+  font-size:34px; font-weight:600;
+  letter-spacing:10px; color:var(--gold);
+  margin-bottom:6px;
+}
+.brand-sub {
+  font-family:'Inter',sans-serif;
+  font-size:10px; letter-spacing:6px;
+  color:var(--text-dim); text-transform:uppercase;
+  margin-bottom:56px;
+}
+
+.intro-line {
+  width:1px; height:60px;
+  background:linear-gradient(180deg,transparent,var(--gold-dim),transparent);
+  margin:0 auto 48px;
+}
+
+.intro-text {
+  font-size:20px; font-style:italic; font-weight:300;
+  color:var(--text-mid); line-height:1.95;
+  max-width:320px; margin-bottom:56px;
+}
+.intro-text em { color:var(--gold-light); font-style:normal; font-weight:400; }
+
+.trust-row {
+  margin-top:20px;
+  font-family:'Inter',sans-serif;
+  font-size:11px; color:var(--text-dim);
+  letter-spacing:2px;
+}
+
+/* ── SCREEN 2: FORM ── */
 #s-form { padding:52px 28px 48px; align-items:center; }
-.form-top { text-align:center; margin-bottom:36px; width:100%; }
-.form-title { font-family:'Cinzel',serif; font-size:22px; color:var(--gold); margin-bottom:10px; letter-spacing:2px; }
-.form-desc { font-size:16px; color:var(--text-dim); line-height:1.7; }
-.field { width:100%; max-width:380px; margin-bottom:22px; }
-.label { display:block; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--gold-dim); margin-bottom:9px; }
-.input { width:100%; background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:16px 18px; font-family:'Cormorant Garamond',serif; font-size:18px; outline:none; transition:border-color .3s,box-shadow .3s; }
-.input:focus { border-color:var(--gold); box-shadow:0 0 0 1px var(--gold-dim); }
-.input::placeholder { color:var(--text-dim); opacity:.4; }
-.photo-zone { width:100%; max-width:380px; height:160px; border:1px dashed var(--border-bright); background:var(--bg3); display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; transition:all .3s; position:relative; overflow:hidden; margin-bottom:28px; }
-.photo-zone:hover { border-color:var(--gold); background:rgba(201,168,76,.04); }
-.photo-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+
+.form-header { text-align:center; margin-bottom:40px; width:100%; }
+.form-title { font-family:'Cinzel',serif; font-size:20px; color:var(--gold); letter-spacing:2px; margin-bottom:10px; }
+.form-desc { font-size:15px; color:var(--text-dim); line-height:1.7; font-family:'Inter',sans-serif; }
+
+.field { width:100%; max-width:380px; margin-bottom:20px; }
+.field-label {
+  display:block; font-family:'Inter',sans-serif;
+  font-size:10px; letter-spacing:4px; text-transform:uppercase;
+  color:var(--gold-dim); margin-bottom:10px;
+}
+
+.field-input {
+  width:100%; background:var(--bg3);
+  border:1px solid var(--border); color:var(--text);
+  padding:15px 18px; font-family:'Cormorant Garamond',serif;
+  font-size:18px; outline:none;
+  transition:all 0.3s;
+}
+.field-input:focus { border-color:var(--gold); background:var(--bg4); }
+.field-input::placeholder { color:var(--text-dim); opacity:0.35; }
+
+.photo-drop {
+  width:100%; max-width:380px; height:150px;
+  border:1px dashed var(--border-bright); background:var(--bg3);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  cursor:pointer; transition:all 0.3s; position:relative; overflow:hidden;
+  margin-bottom:28px;
+  animation:pulse-border 3s ease-in-out infinite;
+}
+.photo-drop:hover { border-color:var(--gold); background:var(--bg4); }
+.photo-drop input { position:absolute; inset:0; opacity:0; cursor:pointer; }
 .photo-prev { width:100%; height:100%; object-fit:cover; position:absolute; inset:0; display:none; }
 
-/* ══ LOADING ══ */
+/* ── SCREEN 3: LOADING ── */
 #s-loading { align-items:center; justify-content:center; text-align:center; padding:40px 28px; }
-.rings { width:160px; height:160px; margin:0 auto 44px; position:relative; }
+
+.rings { width:170px; height:170px; margin:0 auto 48px; position:relative; }
 .ring { position:absolute; inset:0; border-radius:50%; border:1px solid transparent; }
-.r1{border-top-color:var(--gold);border-right-color:var(--gold-dim);animation:spin 2.2s linear infinite}
-.r2{inset:14px;border-bottom-color:var(--gold);border-left-color:var(--gold-dim);animation:spin 3.1s linear infinite reverse}
-.r3{inset:28px;border-top-color:var(--gold-light);animation:spin 1.6s linear infinite}
-.r4{inset:42px;border-right-color:var(--gold-dim);animation:spin 4s linear infinite reverse}
-.ring-center { position:absolute; inset:55px; display:flex; align-items:center; justify-content:center; font-size:24px; animation:breathe 3s ease-in-out infinite; }
-.load-title { font-family:'Cinzel',serif; font-size:17px; color:var(--gold); letter-spacing:3px; margin-bottom:16px; }
-.load-status { font-size:16px; color:var(--text-dim); font-style:italic; min-height:26px; }
-.load-bar-wrap { width:220px; height:1px; background:var(--bg3); margin:28px auto 0; overflow:hidden; }
-.load-bar { height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold)); width:0%; transition:width .6s ease; box-shadow:0 0 8px var(--gold); }
+.r1{border-top-color:var(--gold);border-right-color:var(--gold-dim);animation:spin 2.4s linear infinite}
+.r2{inset:16px;border-bottom-color:var(--gold);border-left-color:var(--gold-dim);animation:spin 3.5s linear infinite reverse}
+.r3{inset:32px;border-top-color:var(--gold-light);opacity:0.6;animation:spin 1.8s linear infinite}
+.r4{inset:48px;border-right-color:var(--gold-dim);animation:spin 4.5s linear infinite reverse}
+.r5{inset:62px;border-bottom-color:rgba(201,168,76,0.3);animation:spin 2s linear infinite}
+.ring-center { position:absolute; inset:62px; display:flex; align-items:center; justify-content:center; font-size:22px; animation:breathe 3s ease-in-out infinite; }
 
-/* ══ PAGE HERO ══ */
-.page-hero { padding:48px 28px 36px; text-align:center; background:linear-gradient(180deg,var(--bg3) 0%,var(--bg) 100%); border-bottom:1px solid var(--border); position:relative; overflow:hidden; }
-.page-hero::before { content:''; position:absolute; top:-60%; left:50%; transform:translateX(-50%); width:400px; height:400px; background:radial-gradient(circle,rgba(201,168,76,.06) 0%,transparent 65%); pointer-events:none; }
-.avatar { width:72px; height:72px; border-radius:50%; border:1px solid var(--gold); object-fit:cover; display:block; margin:0 auto 16px; box-shadow:0 0 24px rgba(201,168,76,.25); }
-.hero-name { font-family:'Cinzel',serif; font-size:18px; color:var(--gold); margin-bottom:4px; letter-spacing:2px; }
-.hero-date { font-size:13px; color:var(--text-dim); letter-spacing:2px; }
-.page-body { padding:32px 24px 0; }
-.next-btn-wrap { padding:32px 24px 48px; }
+.load-label { font-family:'Cinzel',serif; font-size:15px; color:var(--gold); letter-spacing:4px; margin-bottom:14px; }
+.load-status { font-size:15px; color:var(--text-dim); font-style:italic; min-height:24px; font-family:'Inter',sans-serif; }
+.load-track { width:240px; height:1px; background:var(--bg3); margin:28px auto 0; overflow:hidden; }
+.load-fill { height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold),var(--gold-light)); width:0%; transition:width 0.8s ease; box-shadow:0 0 10px var(--gold); }
 
-/* ══ TABELA NUMÉRICA ══ */
-.num-table { width:100%; border-collapse:collapse; margin:20px 0 28px; }
-.num-table td { padding:11px 0; border-bottom:1px solid var(--border); font-size:16px; vertical-align:top; }
-.num-table td:first-child { color:var(--text-dim); font-size:12px; letter-spacing:2px; text-transform:uppercase; width:42%; padding-right:12px; }
-.num-big { font-family:'Cinzel',serif; font-size:22px; color:var(--gold); }
-
-/* ══ CÁLCULO EXPLICADO ══ */
-.calc-box { background:var(--bg3); border:1px solid var(--border); padding:20px; margin:0 0 28px; }
-.calc-title { font-family:'Cinzel',serif; font-size:13px; letter-spacing:3px; color:var(--gold-dim); margin-bottom:14px; text-transform:uppercase; }
-.calc-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
-.calc-letter { background:var(--bg); border:1px solid var(--border); padding:5px 9px; font-size:14px; text-align:center; min-width:38px; }
-.calc-letter span { display:block; font-family:'Cinzel',serif; font-size:11px; color:var(--gold); }
-.calc-sum { font-size:15px; color:var(--text-mid); margin-top:6px; }
-.calc-sum strong { color:var(--gold); font-family:'Cinzel',serif; font-size:18px; }
-
-/* ══ BARRAS ANCESTRAIS ══ */
-.anc-item { margin-bottom:18px; }
-.anc-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px; }
-.anc-name { font-size:17px; color:var(--text); }
-.anc-pct { font-family:'Cinzel',serif; font-size:15px; color:var(--gold); }
-.anc-bar { height:3px; background:var(--bg3); border-radius:2px; overflow:hidden; }
-.anc-fill { height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold)); border-radius:2px; animation:grow 1.4s ease forwards; }
-
-/* ══ PERSONALIDADE: VIRTUDES / DEFEITOS ══ */
-.trait-grid { display:grid; gap:12px; margin:20px 0 28px; }
-.trait-card { background:var(--bg3); border-left:3px solid; padding:14px 16px; }
-.trait-card.virtue { border-color:var(--green); }
-.trait-card.flaw { border-color:var(--red); }
-.trait-card-label { font-size:11px; letter-spacing:3px; text-transform:uppercase; margin-bottom:6px; }
-.trait-card.virtue .trait-card-label { color:var(--green); }
-.trait-card.flaw .trait-card-label { color:var(--red); }
-.trait-card-name { font-family:'Cinzel',serif; font-size:16px; color:var(--text); margin-bottom:5px; }
-.trait-card-desc { font-size:15px; color:var(--text-dim); line-height:1.6; }
-
-/* ══ LIDERANÇA RADAR ══ */
-.radar-wrap { margin:20px 0 28px; display:flex; flex-direction:column; gap:10px; }
-.radar-item { display:flex; align-items:center; gap:12px; }
-.radar-label { font-size:14px; color:var(--text-dim); width:140px; flex-shrink:0; letter-spacing:1px; }
-.radar-bar { flex:1; height:6px; background:var(--bg3); border-radius:3px; overflow:hidden; }
-.radar-fill { height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold)); border-radius:3px; animation:grow 1.2s ease forwards; }
-.radar-val { font-family:'Cinzel',serif; font-size:13px; color:var(--gold); width:30px; text-align:right; }
-
-/* ══ BLUR / LOCK ══ */
-.blur-section { position:relative; margin-bottom:32px; }
-.blur-content { filter:blur(5px); user-select:none; pointer-events:none; max-height:160px; overflow:hidden; }
-.blur-overlay {
-  position:absolute; inset:0;
-  background:linear-gradient(180deg, transparent 0%, rgba(6,6,10,0.85) 50%, rgba(6,6,10,0.98) 100%);
-  display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
-  padding-bottom:20px;
+/* ── PAGE HERO ── */
+.page-hero {
+  padding:44px 28px 32px; text-align:center;
+  background:linear-gradient(180deg, var(--bg3) 0%, var(--bg) 100%);
+  border-bottom:1px solid var(--border);
+  position:relative; overflow:hidden;
 }
-.blur-cta { font-size:13px; letter-spacing:2px; color:var(--gold); text-transform:uppercase; text-align:center; }
-.lock-badge { font-size:20px; margin-bottom:8px; }
+.page-hero::before {
+  content:''; position:absolute; top:-40%; left:50%; transform:translateX(-50%);
+  width:500px; height:300px;
+  background:radial-gradient(ellipse,rgba(201,168,76,0.05) 0%,transparent 70%);
+  pointer-events:none;
+}
 
-/* ══ PAYWALL ══ */
+.hero-avatar {
+  width:68px; height:68px; border-radius:50%;
+  border:1px solid var(--gold); object-fit:cover;
+  display:block; margin:0 auto 14px;
+  box-shadow:0 0 30px rgba(201,168,76,0.2);
+}
+.hero-name { font-family:'Cinzel',serif; font-size:17px; color:var(--gold); letter-spacing:3px; margin-bottom:4px; }
+.hero-info { font-family:'Inter',sans-serif; font-size:11px; color:var(--text-dim); letter-spacing:3px; }
+
+.page-body { padding:28px 22px 0; max-width:480px; margin:0 auto; width:100%; }
+.next-wrap { padding:28px 22px 48px; max-width:480px; margin:0 auto; width:100%; }
+
+/* ── ANCESTRY BARS ── */
+.anc-item { margin-bottom:16px; }
+.anc-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px; }
+.anc-name { font-size:16px; color:var(--text); }
+.anc-pct { font-family:'Cinzel',serif; font-size:14px; color:var(--gold); }
+.anc-track { height:2px; background:var(--bg3); }
+.anc-fill { height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold)); animation:grow 1.5s ease forwards; }
+
+/* ── CALC BOX ── */
+.calc-box {
+  background:var(--bg3); border:1px solid var(--border);
+  padding:18px; margin-bottom:24px;
+}
+.calc-title {
+  font-family:'Inter',sans-serif; font-size:10px;
+  letter-spacing:3px; text-transform:uppercase;
+  color:var(--gold-dim); margin-bottom:12px;
+}
+.calc-letters { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:8px; }
+.calc-letter {
+  background:var(--bg); border:1px solid var(--border);
+  padding:5px 8px; text-align:center; min-width:34px;
+  font-size:13px;
+}
+.calc-letter span { display:block; font-family:'Cinzel',serif; font-size:10px; color:var(--gold); }
+.calc-result { font-family:'Inter',sans-serif; font-size:13px; color:var(--text-mid); margin-top:6px; }
+.calc-result strong { color:var(--gold); font-family:'Cinzel',serif; font-size:17px; }
+
+/* ── NUM TABLE ── */
+.num-table { width:100%; border-collapse:collapse; margin:0 0 24px; }
+.num-table td { padding:11px 0; border-bottom:1px solid var(--border); font-size:15px; vertical-align:middle; }
+.num-table td:first-child { font-family:'Inter',sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--text-dim); width:44%; padding-right:10px; }
+.num-big { font-family:'Cinzel',serif; font-size:22px; color:var(--gold); margin-right:8px; }
+
+/* ── PSYCHOLOGICAL LAYERS ── */
+.layer-card {
+  background:var(--bg3); border:1px solid var(--border);
+  padding:20px; margin-bottom:14px;
+  position:relative; overflow:hidden;
+}
+.layer-card::before {
+  content:''; position:absolute;
+  left:0; top:0; bottom:0; width:2px;
+}
+.layer-card.virtue::before { background:var(--green-light); }
+.layer-card.flaw::before { background:var(--red-light); }
+.layer-card.blind::before { background:var(--purple-light); }
+
+.layer-tag {
+  font-family:'Inter',sans-serif; font-size:9px;
+  letter-spacing:4px; text-transform:uppercase;
+  margin-bottom:6px;
+}
+.layer-card.virtue .layer-tag { color:var(--green-light); }
+.layer-card.flaw .layer-tag { color:var(--red-light); }
+.layer-card.blind .layer-tag { color:var(--purple-light); }
+
+.layer-name { font-family:'Cinzel',serif; font-size:15px; color:var(--text); margin-bottom:6px; }
+.layer-desc { font-size:15px; color:var(--text-mid); line-height:1.7; font-weight:300; }
+
+/* ── RADAR ── */
+.radar-item { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.radar-label { font-family:'Inter',sans-serif; font-size:12px; color:var(--text-dim); width:150px; flex-shrink:0; letter-spacing:0.5px; }
+.radar-track { flex:1; height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; }
+.radar-fill { height:100%; background:linear-gradient(90deg,var(--gold-dim),var(--gold)); border-radius:2px; animation:grow 1.3s ease forwards; }
+.radar-num { font-family:'Cinzel',serif; font-size:12px; color:var(--gold); width:28px; text-align:right; }
+
+/* ── BLUR / LOCK ── */
+.blur-wrap { position:relative; margin-bottom:28px; }
+.blur-inner { filter:blur(6px); user-select:none; pointer-events:none; max-height:200px; overflow:hidden; }
+.blur-gate {
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(5,5,8,0) 0%, rgba(5,5,8,0.7) 40%, rgba(5,5,8,0.97) 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+  padding-bottom:24px;
+}
+.blur-icon { font-size:22px; margin-bottom:8px; }
+.blur-text { font-family:'Inter',sans-serif; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--gold); text-align:center; }
+
+/* ── PAYWALL ── */
 #s-paywall { align-items:center; justify-content:center; padding:52px 28px; text-align:center; }
-.pw-sigil { width:90px; height:90px; margin:0 auto 28px; animation:breathe 4s ease-in-out infinite; }
-.pw-title { font-family:'Cinzel',serif; font-size:24px; color:var(--gold); margin-bottom:12px; letter-spacing:2px; line-height:1.4; }
-.pw-sub { font-size:17px; color:var(--text-mid); font-style:italic; margin-bottom:36px; line-height:1.7; max-width:320px; }
-.features { width:100%; max-width:340px; margin:0 auto 32px; text-align:left; }
-.feat { display:flex; align-items:flex-start; gap:12px; padding:11px 0; border-bottom:1px solid var(--border); font-size:16px; color:var(--text-mid); line-height:1.5; }
-.feat:last-child { border-bottom:none; }
-.feat-icon { color:var(--gold); font-size:14px; margin-top:3px; flex-shrink:0; }
-.price-row { display:flex; align-items:center; justify-content:center; gap:16px; margin-bottom:20px; }
-.price-old { font-size:16px; color:var(--text-dim); text-decoration:line-through; }
-.price-new { font-family:'Cinzel',serif; font-size:32px; color:var(--gold); font-weight:700; text-shadow:0 0 20px rgba(201,168,76,.3); }
-.price-tag { background:rgba(201,168,76,.12); border:1px solid var(--border-bright); font-size:11px; color:var(--gold); padding:4px 10px; letter-spacing:2px; }
-.btn-pay { background:linear-gradient(135deg,#5C3D0A,var(--gold),#E8C97A); color:#000; border:none; padding:20px 0; width:100%; max-width:340px; font-family:'Cinzel',serif; font-size:14px; letter-spacing:4px; cursor:pointer; transition:all .4s; position:relative; overflow:hidden; clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%); margin-bottom:12px; }
-.btn-pay::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent); transition:left .6s; }
-.btn-pay:hover::before { left:100%; }
-.btn-pay:hover { transform:translateY(-3px); box-shadow:0 12px 40px rgba(201,168,76,.4); }
-.pw-note { font-size:13px; color:var(--text-dim); letter-spacing:1px; }
 
-/* ══ FULL REPORT ══ */
-#s-full { padding:52px 28px 80px; align-items:center; }
-.full-top { text-align:center; margin-bottom:40px; }
-.full-title { font-family:'Cinzel',serif; font-size:22px; color:var(--gold); margin-bottom:8px; letter-spacing:2px; }
-.full-section { width:100%; max-width:420px; margin-bottom:44px; animation:fadeUp .6s ease forwards; opacity:0; transform:translateY(20px); }
-.fs-label { font-size:11px; letter-spacing:4px; text-transform:uppercase; color:var(--gold-dim); margin-bottom:8px; }
-.fs-title { font-family:'Cinzel',serif; font-size:18px; color:var(--gold); margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--border); letter-spacing:1px; }
+.pw-eye { width:80px; height:80px; margin:0 auto 28px; animation:breathe 5s ease-in-out infinite; }
+.pw-eyebrow { font-family:'Inter',sans-serif; font-size:10px; letter-spacing:5px; text-transform:uppercase; color:var(--gold-dim); margin-bottom:12px; }
+.pw-title { font-family:'Cinzel',serif; font-size:22px; color:var(--gold); line-height:1.4; margin-bottom:10px; letter-spacing:2px; }
+.pw-sub { font-size:16px; color:var(--text-mid); font-style:italic; margin-bottom:36px; line-height:1.8; max-width:300px; }
+
+.pw-items { width:100%; max-width:340px; margin:0 auto 32px; text-align:left; }
+.pw-item { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); font-size:15px; color:var(--text-mid); line-height:1.5; font-weight:300; }
+.pw-item:last-child { border:none; }
+.pw-item-dot { color:var(--gold); margin-top:3px; flex-shrink:0; font-size:12px; }
+
+.price-wrap { margin-bottom:20px; }
+.price-old { font-family:'Inter',sans-serif; font-size:14px; color:var(--text-dim); text-decoration:line-through; margin-right:12px; }
+.price-new { font-family:'Cinzel',serif; font-size:36px; color:var(--gold); font-weight:600; text-shadow:0 0 24px rgba(201,168,76,0.25); }
+.price-badge { display:inline-block; background:rgba(201,168,76,0.1); border:1px solid var(--border-bright); font-family:'Inter',sans-serif; font-size:10px; color:var(--gold); padding:4px 10px; letter-spacing:3px; margin-top:6px; }
+
+.btn-pay {
+  background:linear-gradient(135deg, #3D2800, var(--gold) 50%, #E8C97A);
+  color:#000; border:none; padding:20px 0;
+  width:100%; max-width:340px;
+  font-family:'Cinzel',serif; font-size:13px; letter-spacing:5px;
+  cursor:pointer; transition:all 0.4s; position:relative; overflow:hidden;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  margin-bottom:12px; font-weight:600;
+}
+.btn-pay::before { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent); transition:left 0.7s; }
+.btn-pay:hover::before{left:100%}
+.btn-pay:hover{transform:translateY(-2px);box-shadow:0 16px 48px rgba(201,168,76,0.35)}
+
+.pw-note { font-family:'Inter',sans-serif; font-size:11px; color:var(--text-dim); letter-spacing:1px; }
+
+/* ── FULL REPORT ── */
+#s-full { padding:52px 22px 80px; align-items:center; }
+.full-header { text-align:center; margin-bottom:44px; }
+.full-title { font-family:'Cinzel',serif; font-size:20px; color:var(--gold); letter-spacing:3px; margin-bottom:8px; }
+.full-sub { font-family:'Inter',sans-serif; font-size:12px; color:var(--text-dim); letter-spacing:2px; }
+
+.report-section {
+  width:100%; max-width:440px;
+  margin-bottom:48px;
+  animation:fadeUp 0.7s ease forwards; opacity:0; transform:translateY(18px);
+}
+
+.rs-eyebrow { font-family:'Inter',sans-serif; font-size:9px; letter-spacing:5px; text-transform:uppercase; color:var(--gold-dim); margin-bottom:8px; }
+.rs-title { font-family:'Cinzel',serif; font-size:17px; color:var(--gold); margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--border); letter-spacing:1px; }
+
+/* Quote block */
+.quote-block {
+  border-left:2px solid var(--gold-dim);
+  padding:0 0 0 20px; margin:20px 0;
+  font-style:italic; color:var(--text-mid);
+  font-size:17px; line-height:1.9;
+}
 </style>
 </head>
 <body>
 
-<!-- ══ INTRO ══ -->
+<!-- ══════════ INTRO ══════════ -->
 <div id="s-intro" class="screen active">
-  <div class="eye-wrap">
-    <svg viewBox="0 0 110 110" fill="none">
-      <circle cx="55" cy="55" r="50" stroke="#C9A84C" stroke-width=".5" opacity=".3"/>
-      <circle cx="55" cy="55" r="36" stroke="#C9A84C" stroke-width=".5" opacity=".5"/>
-      <polygon points="55,12 82,55 28,55" stroke="#C9A84C" stroke-width="1" fill="none" opacity=".7"/>
-      <polygon points="55,98 28,55 82,55" stroke="#C9A84C" stroke-width="1" fill="none" opacity=".7"/>
-      <circle cx="55" cy="55" r="20" stroke="#C9A84C" stroke-width=".8" opacity=".6"/>
-      <circle cx="55" cy="55" r="7" fill="#C9A84C" opacity=".9"/>
-      <circle cx="55" cy="55" r="3" fill="#06060A"/>
-      <line x1="55" y1="2" x2="55" y2="10" stroke="#C9A84C" stroke-width="1" opacity=".4"/>
-      <line x1="55" y1="100" x2="55" y2="108" stroke="#C9A84C" stroke-width="1" opacity=".4"/>
-      <line x1="2" y1="55" x2="10" y2="55" stroke="#C9A84C" stroke-width="1" opacity=".4"/>
-      <line x1="100" y1="55" x2="108" y2="55" stroke="#C9A84C" stroke-width="1" opacity=".4"/>
+  <div class="sigil-wrap">
+    <svg viewBox="0 0 120 120" fill="none">
+      <circle cx="60" cy="60" r="56" stroke="#C9A84C" stroke-width="0.4" opacity="0.3"/>
+      <circle cx="60" cy="60" r="40" stroke="#C9A84C" stroke-width="0.4" opacity="0.4"/>
+      <circle cx="60" cy="60" r="24" stroke="#C9A84C" stroke-width="0.6" opacity="0.5"/>
+      <polygon points="60,10 95,65 25,65" stroke="#C9A84C" stroke-width="0.8" fill="none" opacity="0.6"/>
+      <polygon points="60,110 25,55 95,55" stroke="#C9A84C" stroke-width="0.8" fill="none" opacity="0.6"/>
+      <circle cx="60" cy="60" r="8" fill="#C9A84C" opacity="0.85"/>
+      <circle cx="60" cy="60" r="3" fill="#050508"/>
+      <line x1="60" y1="1" x2="60" y2="9" stroke="#C9A84C" stroke-width="0.8" opacity="0.3"/>
+      <line x1="60" y1="111" x2="60" y2="119" stroke="#C9A84C" stroke-width="0.8" opacity="0.3"/>
+      <line x1="1" y1="60" x2="9" y2="60" stroke="#C9A84C" stroke-width="0.8" opacity="0.3"/>
+      <line x1="111" y1="60" x2="119" y2="60" stroke="#C9A84C" stroke-width="0.8" opacity="0.3"/>
     </svg>
   </div>
+
   <h1 class="brand">ANCESTRALIA</h1>
-  <p class="brand-sub">Origem · Alma · Destino</p>
-  <div class="hr-gold"></div>
-  <p class="intro-quote">"Seus traços carregam a memória de <em>milênios</em>. Seu nome oculta números que definem seu <em>destino</em>. Conheça quem você realmente é."</p>
-  <button class="btn" style="margin:0 auto;" onclick="go('s-form')">INICIAR MINHA ANÁLISE</button>
-  <p class="trust">✦ Numerologia cabalística real · Análise ancestral por IA</p>
+  <p class="brand-sub">Origem · Psique · Destino</p>
+  <div class="intro-line"></div>
+
+  <p class="intro-text">
+    "Seu nome guarda números que revelam sua <em>psicologia profunda</em>. Seus traços guardam a memória de <em>civilizações inteiras</em>."
+  </p>
+
+  <button class="btn-primary" onclick="go('s-form')">REVELAR MEU MAPA</button>
+  <p class="trust-row" style="margin-top:18px">✦ Numerologia cabalística real · Análise ancestral por IA</p>
 </div>
 
-<!-- ══ FORMULÁRIO ══ -->
+<!-- ══════════ FORM ══════════ -->
 <div id="s-form" class="screen">
-  <div class="form-top">
-    <p class="eyebrow" style="text-align:center">Os Três Portais</p>
-    <h2 class="form-title" style="text-align:center">Seus Dados Sagrados</h2>
-    <p class="form-desc" style="text-align:center">Sua face, seu nome e seu nascimento revelam tudo</p>
+  <div class="form-header">
+    <p class="eyebrow" style="text-align:center">Três Portais</p>
+    <h2 class="form-title">Seus Dados Sagrados</h2>
+    <p class="form-desc">Foto, nome e nascimento — os três elementos para calcular seu mapa</p>
   </div>
-  <div class="field" style="margin:0 auto 4px;">
-    <label class="label">✦ Selfie</label>
-    <div class="photo-zone" id="photoZone">
-      <input type="file" accept="image/*" capture="user" id="photoInput" onchange="handlePhoto(this)">
-      <div id="upPlaceholder" style="text-align:center">
-        <div style="font-size:28px;margin-bottom:8px">📸</div>
-        <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dim)">Tirar ou carregar foto</div>
-        <div style="font-size:12px;color:var(--text-dim);margin-top:5px">Para análise ancestral</div>
+
+  <div class="field" style="margin:0 auto 4px">
+    <label class="field-label">✦ Selfie — para análise ancestral</label>
+    <div class="photo-drop" id="photoZone">
+      <input type="file" accept="image/*" capture="user" onchange="handlePhoto(this)">
+      <div id="upHolder" style="text-align:center;pointer-events:none">
+        <div style="font-size:26px;margin-bottom:8px">📸</div>
+        <div style="font-family:'Inter',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dim)">Tirar ou carregar foto</div>
       </div>
       <img class="photo-prev" id="photoPrev" alt="">
     </div>
   </div>
-  <div class="field" style="margin:16px auto 0;">
-    <label class="label">✦ Nome Completo</label>
-    <input class="input" type="text" id="iName" placeholder="Seu nome completo">
+
+  <div class="field" style="margin:16px auto 0">
+    <label class="field-label">✦ Nome Completo</label>
+    <input class="field-input" type="text" id="iName" placeholder="Seu nome completo">
   </div>
-  <div class="field" style="margin:0 auto 28px;">
-    <label class="label">✦ Data de Nascimento</label>
-    <input class="input" type="date" id="iDate">
+
+  <div class="field" style="margin:0 auto 32px">
+    <label class="field-label">✦ Data de Nascimento</label>
+    <input class="field-input" type="date" id="iDate">
   </div>
-  <button class="btn" style="margin:0 auto;" onclick="startAnalysis()">CALCULAR MEU MAPA</button>
-  <p class="trust" style="text-align:center;margin-top:14px">🔒 Dados privados e seguros</p>
+
+  <button class="btn-primary" style="margin:0 auto" onclick="startAnalysis()">CALCULAR MEU MAPA</button>
+  <p class="trust-row" style="text-align:center;margin-top:14px">🔒 Privado e seguro</p>
 </div>
 
-<!-- ══ LOADING ══ -->
+<!-- ══════════ LOADING ══════════ -->
 <div id="s-loading" class="screen">
   <div class="rings">
     <div class="ring r1"></div><div class="ring r2"></div>
-    <div class="ring r3"></div><div class="ring r4"></div>
+    <div class="ring r3"></div><div class="ring r4"></div><div class="ring r5"></div>
     <div class="ring-center">🔮</div>
   </div>
-  <p class="load-title">CALCULANDO SEU MAPA</p>
+  <p class="load-label">CALCULANDO SEU MAPA</p>
   <p class="load-status" id="loadStatus">Iniciando cálculos cabalísticos...</p>
-  <div class="load-bar-wrap"><div class="load-bar" id="loadBar"></div></div>
+  <div class="load-track"><div class="load-fill" id="loadBar"></div></div>
 </div>
 
-<!-- ══ ANCESTRALIDADE ══ -->
+<!-- ══════════ ANCESTRALIDADE ══════════ -->
 <div id="s-ancestry" class="screen">
   <div class="page-hero">
-    <img id="ancAvatar" class="avatar" src="" alt="">
+    <img id="ancAvatar" class="hero-avatar" src="" alt="">
     <p class="hero-name" id="ancName"></p>
-    <p class="hero-date" id="ancDate"></p>
+    <p class="hero-info" id="ancDate"></p>
   </div>
+
   <div class="page-body">
-    <p class="eyebrow fade-in d1">Capítulo I</p>
-    <h2 class="section-title fade-in d1">Sua Origem Ancestral</h2>
+    <p class="eyebrow fade-in d1">Capítulo I · Origem</p>
+    <h2 class="section-title fade-in d1">Sua Herança Ancestral</h2>
+
     <div id="ancBars" class="fade-in d2"></div>
-    <div class="divider fade-in d3">✦ ✦ ✦</div>
+
+    <div class="divider fade-in d3"><span>✦</span></div>
+
     <div class="long-text fade-in d3" id="ancText"></div>
 
-    <!-- BLUR: narrativa completa bloqueada -->
-    <div class="blur-section fade-in d4">
-      <div class="blur-content" id="ancBlurContent">
-        <div class="long-text" id="ancBlurText"></div>
-      </div>
-      <div class="blur-overlay">
-        <div class="lock-badge">🔒</div>
-        <p class="blur-cta">Desbloqueie a narrativa ancestral completa</p>
+    <!-- BLUR: narrativa completa -->
+    <div class="blur-wrap fade-in d4">
+      <div class="blur-inner"><div class="long-text" id="ancBlur"></div></div>
+      <div class="blur-gate">
+        <div class="blur-icon">🔒</div>
+        <p class="blur-text">Narrativa ancestral completa bloqueada</p>
       </div>
     </div>
   </div>
-  <div class="next-btn-wrap fade-in d5">
-    <button class="btn" style="width:100%;" id="btnToNum">CONTINUAR → MAPA CABALÍSTICO</button>
+
+  <div class="next-wrap fade-in d5">
+    <button class="btn-primary" id="btnToNum" style="width:100%">CONTINUAR → MAPA PSICOLÓGICO</button>
   </div>
 </div>
 
-<!-- ══ NUMEROLOGIA ══ -->
+<!-- ══════════ NUMEROLOGIA / PSICOLOGIA ══════════ -->
 <div id="s-numerology" class="screen">
   <div class="page-hero">
-    <img id="numAvatar" class="avatar" src="" alt="">
+    <img id="numAvatar" class="hero-avatar" src="" alt="">
     <p class="hero-name" id="numName"></p>
-    <p class="hero-date" id="numDate"></p>
+    <p class="hero-info" id="numDate"></p>
   </div>
+
   <div class="page-body">
-    <p class="eyebrow fade-in d1">Capítulo II</p>
-    <h2 class="section-title fade-in d1">Mapa Cabalístico Completo</h2>
-
     <!-- Cálculo explicado -->
-    <div class="fade-in d2">
-      <p class="eyebrow" style="margin-bottom:8px">Como foi calculado</p>
-      <div class="calc-box" id="calcBox"></div>
-    </div>
+    <p class="eyebrow fade-in d1">Como foi calculado</p>
+    <div class="calc-box fade-in d1" id="calcBox"></div>
 
-    <!-- Tabela dos números -->
-    <table class="num-table fade-in d3" id="numTable"></table>
+    <!-- Números -->
+    <p class="eyebrow fade-in d2">Seus Números Cabalísticos</p>
+    <table class="num-table fade-in d2" id="numTable"></table>
 
-    <div class="divider fade-in d3">✦ ✦ ✦</div>
+    <div class="divider fade-in d3"><span>✦</span></div>
 
-    <!-- Análise da personalidade: virtudes e defeitos -->
-    <p class="eyebrow fade-in d3">Análise de Personalidade</p>
-    <h3 class="section-title fade-in d3" style="font-size:17px;" id="numPersonTitle"></h3>
-    <div class="long-text fade-in d4" id="numPersonText"></div>
+    <!-- Camada 1: Quem você é -->
+    <p class="eyebrow fade-in d3">Camada I · Psicologia Profunda</p>
+    <h3 class="section-title fade-in d3" id="numLayerTitle"></h3>
+    <div class="long-text fade-in d3" id="numLayerText"></div>
 
-    <!-- Virtudes -->
-    <p class="eyebrow fade-in d4" style="margin-top:8px;color:#4A8C5C">Virtudes Reveladas</p>
-    <div class="trait-grid fade-in d4" id="virtueGrid"></div>
+    <!-- Virtudes visíveis -->
+    <p class="eyebrow fade-in d4" style="margin-top:8px;color:var(--green-light)">Forças Internas</p>
+    <div id="virtueCards" class="fade-in d4"></div>
 
-    <!-- BLUR: Defeitos bloqueados -->
-    <div class="blur-section fade-in d5">
-      <p class="eyebrow" style="margin-bottom:8px;color:var(--red)">Desafios e Sombras</p>
-      <div class="blur-content" id="flawBlur">
-        <div class="trait-grid" id="flawGrid"></div>
-      </div>
-      <div class="blur-overlay">
-        <div class="lock-badge">🔒</div>
-        <p class="blur-cta">Desbloqueie seus desafios e como superá-los</p>
+    <!-- BLUR: Defeitos e pontos cegos -->
+    <div class="blur-wrap fade-in d5">
+      <p class="eyebrow" style="color:var(--red-light);margin-bottom:10px">Sombras e Pontos Cegos</p>
+      <div class="blur-inner" id="flawBlur"></div>
+      <div class="blur-gate">
+        <div class="blur-icon">🔒</div>
+        <p class="blur-text">Desbloqueie seus padrões ocultos</p>
       </div>
     </div>
 
-    <!-- Missão -->
-    <p class="eyebrow fade-in d5">Missão de Vida</p>
-    <div class="long-text fade-in d5" id="numMission" style="font-style:italic;color:var(--text-mid);border-left:2px solid var(--gold-dim);padding-left:20px;margin:10px 0 28px;"></div>
-
-    <!-- BLUR: Persuasão + Liderança bloqueados -->
-    <div class="blur-section fade-in d6">
-      <p class="eyebrow" style="margin-bottom:8px">Liderança & Persuasão</p>
-      <div class="blur-content" id="leaderBlur">
-        <div class="radar-wrap" id="radarWrap"></div>
-        <div class="long-text" id="leaderText"></div>
-      </div>
-      <div class="blur-overlay">
-        <div class="lock-badge">🔒</div>
-        <p class="blur-cta">Desbloqueie seu potencial de liderança</p>
+    <!-- BLUR: Persuasão e liderança -->
+    <div class="blur-wrap fade-in d6">
+      <p class="eyebrow" style="margin-bottom:10px">Camada II · Onde você é persuadido</p>
+      <div class="blur-inner" id="persuasionBlur"></div>
+      <div class="blur-gate">
+        <div class="blur-icon">🔒</div>
+        <p class="blur-text">Desbloqueie sua análise de persuasão</p>
       </div>
     </div>
-
-    <div style="height:8px"></div>
   </div>
-  <div class="next-btn-wrap fade-in d6">
-    <button class="btn" style="width:100%;" onclick="go('s-paywall')">DESBLOQUEAR ANÁLISE COMPLETA</button>
+
+  <div class="next-wrap fade-in d6">
+    <button class="btn-primary" style="width:100%" onclick="go('s-paywall')">VER ANÁLISE COMPLETA</button>
   </div>
 </div>
 
-<!-- ══ PAYWALL ══ -->
+<!-- ══════════ PAYWALL ══════════ -->
 <div id="s-paywall" class="screen">
-  <div class="pw-sigil">
-    <svg viewBox="0 0 90 90" fill="none">
-      <circle cx="45" cy="45" r="42" stroke="#C9A84C" stroke-width=".5" opacity=".4"/>
-      <polygon points="45,8 72,48 18,48" stroke="#C9A84C" stroke-width="1" fill="none" opacity=".8"/>
-      <polygon points="45,82 18,42 72,42" stroke="#C9A84C" stroke-width="1" fill="none" opacity=".8"/>
-      <circle cx="45" cy="45" r="8" fill="#C9A84C" opacity=".8"/>
-      <circle cx="45" cy="45" r="3.5" fill="#06060A"/>
+  <div class="pw-eye">
+    <svg viewBox="0 0 80 80" fill="none">
+      <circle cx="40" cy="40" r="37" stroke="#C9A84C" stroke-width="0.5" opacity="0.4"/>
+      <polygon points="40,8 65,45 15,45" stroke="#C9A84C" stroke-width="1" fill="none" opacity="0.8"/>
+      <polygon points="40,72 15,35 65,35" stroke="#C9A84C" stroke-width="1" fill="none" opacity="0.8"/>
+      <circle cx="40" cy="40" r="7" fill="#C9A84C" opacity="0.85"/>
+      <circle cx="40" cy="40" r="2.5" fill="#050508"/>
     </svg>
   </div>
-  <p class="eyebrow">Sua Jornada Continua</p>
+
+  <p class="pw-eyebrow">Sua Jornada Continua</p>
   <h2 class="pw-title">Desbloqueie seu<br>Mapa Completo</h2>
-  <p class="pw-sub" id="pwSub">Você viu apenas metade do que seu mapa cabalístico e ancestral revelam.</p>
-  <div class="features">
-    <div class="feat"><span class="feat-icon">✦</span><span>Narrativa ancestral completa — todas as regiões e suas histórias</span></div>
-    <div class="feat"><span class="feat-icon">✦</span><span>Seus desafios e sombras — e como transformá-los em força</span></div>
-    <div class="feat"><span class="feat-icon">✦</span><span>Potencial de liderança com radar de habilidades detalhado</span></div>
-    <div class="feat"><span class="feat-icon">✦</span><span>Como você é persuadido — seus gatilhos e como usá-los</span></div>
-    <div class="feat"><span class="feat-icon">✦</span><span>Amor, relacionamentos e compatibilidade numerológica</span></div>
-    <div class="feat"><span class="feat-icon">✦</span><span>Vocações e talentos ocultos revelados pelos números</span></div>
-    <div class="feat"><span class="feat-icon">✦</span><span>Previsão do Ano Pessoal atual com orientações práticas</span></div>
+  <p class="pw-sub" id="pwSub">Você viu apenas a superfície. O relatório completo revela o que ninguém te contou sobre você.</p>
+
+  <div class="pw-items">
+    <div class="pw-item"><span class="pw-item-dot">✦</span><span>Sombras e pontos cegos — os padrões que sabotam você sem perceber</span></div>
+    <div class="pw-item"><span class="pw-item-dot">✦</span><span>Onde você é persuadido — seus gatilhos e como usá-los a seu favor</span></div>
+    <div class="pw-item"><span class="pw-item-dot">✦</span><span>Onde pode ser enganado — vulnerabilidades específicas do seu número</span></div>
+    <div class="pw-item"><span class="pw-item-dot">✦</span><span>Metas e propósito de vida — o que veio fazer aqui</span></div>
+    <div class="pw-item"><span class="pw-item-dot">✦</span><span>Amor e relacionamentos — seus padrões de atração e autossabotagem</span></div>
+    <div class="pw-item"><span class="pw-item-dot">✦</span><span>Narrativa ancestral completa com todas as origens</span></div>
   </div>
-  <div class="price-row">
+
+  <div class="price-wrap">
     <span class="price-old">R$47</span>
     <span class="price-new">R$9,90</span>
-    <span class="price-tag">79% OFF</span>
+    <div><span class="price-badge">79% OFF · OFERTA LIMITADA</span></div>
   </div>
-  <button class="btn-pay" onclick="handlePayment()">🔓 DESBLOQUEAR TUDO AGORA</button>
+
+  <button class="btn-pay" onclick="handlePayment()">🔓 DESBLOQUEAR AGORA</button>
   <p class="pw-note">Pagamento único · Acesso imediato · Mercado Pago</p>
 </div>
 
-<!-- ══ RELATÓRIO COMPLETO ══ -->
+<!-- ══════════ RELATÓRIO COMPLETO ══════════ -->
 <div id="s-full" class="screen">
-  <div class="full-top">
-    <div class="pw-sigil" style="width:60px;height:60px;margin-bottom:16px;">
-      <svg viewBox="0 0 90 90" fill="none"><circle cx="45" cy="45" r="42" stroke="#C9A84C" stroke-width=".5" opacity=".4"/><polygon points="45,8 72,48 18,48" stroke="#C9A84C" stroke-width="1" fill="none" opacity=".8"/><polygon points="45,82 18,42 72,42" stroke="#C9A84C" stroke-width="1" fill="none" opacity=".8"/><circle cx="45" cy="45" r="8" fill="#C9A84C" opacity=".8"/><circle cx="45" cy="45" r="3.5" fill="#06060A"/></svg>
+  <div class="full-header">
+    <div class="pw-eye" style="width:60px;height:60px;margin-bottom:16px">
+      <svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="37" stroke="#C9A84C" stroke-width="0.5" opacity="0.4"/><polygon points="40,8 65,45 15,45" stroke="#C9A84C" stroke-width="1" fill="none" opacity="0.8"/><polygon points="40,72 15,35 65,35" stroke="#C9A84C" stroke-width="1" fill="none" opacity="0.8"/><circle cx="40" cy="40" r="7" fill="#C9A84C" opacity="0.85"/><circle cx="40" cy="40" r="2.5" fill="#050508"/></svg>
     </div>
-    <h2 class="full-title">Mapa Completo</h2>
-    <p style="font-size:15px;color:var(--text-dim)">Análise cabalística e ancestral desbloqueada</p>
+    <h2 class="full-title">MAPA COMPLETO</h2>
+    <p class="full-sub">Análise cabalística e ancestral desbloqueada</p>
   </div>
-  <div id="fullContent" style="width:100%;max-width:420px;"></div>
+  <div id="fullContent" style="width:100%;max-width:440px;"></div>
 </div>
 
 <script>
 const MP = 'https://mpago.la/1Ukhfy2';
 const S = { photo:null, b64:null, name:'', date:'', result:null };
 
-// ── CABALÍSTICO: tabela e cálculos ──
+// ── Cabalístico local (100% real) ──
 const CABAL = {A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
 const VOWELS = new Set(['A','E','I','O','U']);
+const norm = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z]/g,' ');
+const reduce = n => { if(n===11||n===22||n===33) return n; while(n>9){n=String(n).split('').reduce((a,b)=>a+Number(b),0);} return n; };
 
-function normalize(str) {
-  return str.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z]/g,' ');
-}
-
-function reduce(n) {
-  if (n === 11 || n === 22 || n === 33) return n;
-  while (n > 9) { n = String(n).split('').reduce((a,b)=>a+Number(b),0); }
-  return n;
-}
-
-function calcName(name) {
-  const clean = normalize(name);
-  const letters = clean.split('').filter(c => c !== ' ');
-  const all = letters.map(c => ({ letter:c, val:CABAL[c]||0 }));
-  const vowels = all.filter(l => VOWELS.has(l.letter));
-  const consonants = all.filter(l => !VOWELS.has(l.letter) && l.val > 0);
-  return {
-    all,
-    expressao: reduce(all.reduce((a,l)=>a+l.val,0)),
-    alma: reduce(vowels.reduce((a,l)=>a+l.val,0)),
-    personalidade: reduce(consonants.reduce((a,l)=>a+l.val,0)),
-    vowels, consonants
-  };
-}
-
-function calcDate(dateStr) {
+function calcNumbers(name, dateStr) {
+  const clean = norm(name);
+  const letters = clean.split('').filter(c=>c!==' ');
+  const expressao = reduce(letters.reduce((a,c)=>a+(CABAL[c]||0),0));
+  const alma = reduce(letters.filter(c=>VOWELS.has(c)).reduce((a,c)=>a+(CABAL[c]||0),0));
+  const personalidade = reduce(letters.filter(c=>!VOWELS.has(c)&&CABAL[c]).reduce((a,c)=>a+(CABAL[c]||0),0));
   const [y,m,d] = dateStr.split('-').map(Number);
   const caminho = reduce([...String(d),...String(m),...String(y)].map(Number).reduce((a,b)=>a+b,0));
   const anoAtual = new Date().getFullYear();
   const anoP = reduce([...String(d),...String(m),...String(anoAtual)].map(Number).reduce((a,b)=>a+b,0));
-  return { caminho, anoP, d, m, y };
+  return { expressao, alma, personalidade, caminho, anoP, letters, clean };
 }
 
-function buildCalcBox(name, dateStr) {
-  const nameCalc = calcName(name);
-  const dateCalc = calcDate(dateStr);
-  const [y,m,d] = dateStr.split('-').map(Number);
-
+function buildCalcBox(name) {
+  const clean = norm(name);
+  const letters = clean.split('').filter(c=>c!==' ');
+  const nums = calcNumbers(name, S.date);
   let html = '';
 
-  // Expressão
-  html += `<div class="calc-title">Número de Expressão (todas as letras)</div>`;
-  html += `<div class="calc-row">`;
-  const words = normalize(name).split(' ').filter(w=>w.length>0);
+  html += `<div class="calc-title">Expressão — todas as letras</div>`;
+  html += `<div class="calc-letters">`;
+  const words = clean.split(' ').filter(w=>w.length>0);
   words.forEach(word => {
     word.split('').forEach(c => {
-      if (CABAL[c]) html += `<div class="calc-letter">${c}<span>${CABAL[c]}</span></div>`;
+      if(CABAL[c]) html += `<div class="calc-letter">${c}<span>${CABAL[c]}</span></div>`;
     });
-    html += `<div style="width:8px"></div>`;
+    html += `<div style="width:6px"></div>`;
   });
   html += `</div>`;
-  const rawExp = nameCalc.all.reduce((a,l)=>a+l.val,0);
-  html += `<div class="calc-sum">Soma: ${rawExp} → reduzindo: <strong>${nameCalc.expressao}</strong></div>`;
+  const rawExp = letters.reduce((a,c)=>a+(CABAL[c]||0),0);
+  html += `<div class="calc-result">Soma: ${rawExp} → <strong>${nums.expressao}</strong></div>`;
 
-  html += `<div style="height:16px"></div>`;
+  html += `<div style="height:14px"></div>`;
+  html += `<div class="calc-title">Alma — somente vogais</div>`;
+  const vowelLetters = letters.filter(c=>VOWELS.has(c));
+  html += `<div class="calc-letters">${vowelLetters.map(c=>`<div class="calc-letter">${c}<span>${CABAL[c]}</span></div>`).join('')}</div>`;
+  const rawAlma = vowelLetters.reduce((a,c)=>a+(CABAL[c]||0),0);
+  html += `<div class="calc-result">Soma: ${rawAlma} → <strong>${nums.alma}</strong></div>`;
 
-  // Alma (vogais)
-  html += `<div class="calc-title">Número da Alma (somente vogais)</div>`;
-  html += `<div class="calc-row">`;
-  nameCalc.vowels.forEach(l => {
-    html += `<div class="calc-letter">${l.letter}<span>${l.val}</span></div>`;
-  });
-  html += `</div>`;
-  const rawAlma = nameCalc.vowels.reduce((a,l)=>a+l.val,0);
-  html += `<div class="calc-sum">Soma: ${rawAlma} → <strong>${nameCalc.alma}</strong></div>`;
-
-  html += `<div style="height:16px"></div>`;
-
-  // Personalidade (consoantes)
-  html += `<div class="calc-title">Número de Personalidade (consoantes)</div>`;
-  html += `<div class="calc-row">`;
-  nameCalc.consonants.forEach(l => {
-    html += `<div class="calc-letter">${l.letter}<span>${l.val}</span></div>`;
-  });
-  html += `</div>`;
-  const rawPers = nameCalc.consonants.reduce((a,l)=>a+l.val,0);
-  html += `<div class="calc-sum">Soma: ${rawPers} → <strong>${nameCalc.personalidade}</strong></div>`;
-
-  html += `<div style="height:16px"></div>`;
-
-  // Caminho de vida
-  html += `<div class="calc-title">Caminho de Vida (data de nascimento)</div>`;
-  const digits = `${String(d).padStart(2,'0')} + ${String(m).padStart(2,'0')} + ${y}`;
+  html += `<div style="height:14px"></div>`;
+  const [y,m,d] = S.date.split('-').map(Number);
+  html += `<div class="calc-title">Caminho de Vida — data de nascimento</div>`;
   const rawCam = [...String(d),...String(m),...String(y)].map(Number).reduce((a,b)=>a+b,0);
-  html += `<div class="calc-sum">${digits} = ${rawCam} → <strong>${dateCalc.caminho}</strong></div>`;
-
-  html += `<div style="height:16px"></div>`;
-
-  // Ano pessoal
-  html += `<div class="calc-title">Ano Pessoal ${new Date().getFullYear()}</div>`;
-  const rawAno = [...String(d),...String(m),...String(new Date().getFullYear())].map(Number).reduce((a,b)=>a+b,0);
-  html += `<div class="calc-sum">${String(d).padStart(2,'0')} + ${String(m).padStart(2,'0')} + ${new Date().getFullYear()} = ${rawAno} → <strong>${dateCalc.anoP}</strong></div>`;
+  html += `<div class="calc-result">${String(d).padStart(2,'0')} + ${String(m).padStart(2,'0')} + ${y} = ${rawCam} → <strong>${nums.caminho}</strong></div>`;
 
   return html;
 }
 
-// ── NAV ──
+// ── Navigation ──
 function go(id) {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -538,7 +675,7 @@ function handlePhoto(input) {
     S.photo = e.target.result; S.b64 = e.target.result.split(',')[1];
     document.getElementById('photoPrev').src = e.target.result;
     document.getElementById('photoPrev').style.display = 'block';
-    document.getElementById('upPlaceholder').style.display = 'none';
+    document.getElementById('upHolder').style.display = 'none';
   };
   reader.readAsDataURL(file);
 }
@@ -560,20 +697,37 @@ async function startAnalysis() {
 }
 
 function animateLoading() {
-  const msgs = ['Iniciando cálculos cabalísticos...','Atribuindo valores às letras...','Calculando números de expressão e alma...','Analisando traços fenotípicos...','Cruzando padrões ancestrais...','Mapeando personalidade e liderança...','Pronto ✦'];
+  const msgs = [
+    'Calculando valores cabalísticos...',
+    'Atribuindo números às letras do nome...',
+    'Analisando traços fenotípicos da foto...',
+    'Mapeando regiões ancestrais...',
+    'Construindo perfil psicológico profundo...',
+    'Identificando padrões de persuasão...',
+    'Compilando mapa completo da alma...',
+    'Pronto ✦'
+  ];
   const bar = document.getElementById('loadBar');
   const stat = document.getElementById('loadStatus');
-  let i=0;
-  const iv = setInterval(()=>{ if(i<msgs.length){stat.textContent=msgs[i]; bar.style.width=((i+1)/msgs.length*100)+'%'; i++;} else clearInterval(iv); },700);
+  let i = 0;
+  const iv = setInterval(() => {
+    if (i < msgs.length) { stat.textContent=msgs[i]; bar.style.width=((i+1)/msgs.length*100)+'%'; i++; }
+    else clearInterval(iv);
+  }, 700);
 }
 
-async function callBackend(photoBase64,name,birthDate) {
-  const res = await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({photoBase64,name,birthDate})});
-  if(!res.ok) throw new Error('err');
-  return res.json();
+async function callBackend(photoBase64, name, birthDate) {
+  const res = await fetch('/api/analyze', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({photoBase64, name, birthDate})
+  });
+  if (!res.ok) throw new Error('Erro servidor');
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
+  return data;
 }
 
-// ── RENDER ANCESTRY ──
+// ── Render Ancestry ──
 function renderAncestry() {
   const data = S.result; const anc = data.ancestralidade;
   const d = new Date(S.date+'T00:00:00');
@@ -582,22 +736,18 @@ function renderAncestry() {
   document.getElementById('ancName').textContent = S.name.split(' ').slice(0,2).join(' ');
   document.getElementById('ancDate').textContent = ds;
 
-  // Barras
   let bars = '';
-  anc.regioes.forEach((r,i)=>{ bars+=`<div class="anc-item"><div class="anc-row"><span class="anc-name">${r.regiao}</span><span class="anc-pct">${r.porcentagem}%</span></div><div class="anc-bar"><div class="anc-fill" style="width:${r.porcentagem}%;animation-delay:${i*.12}s"></div></div></div>`; });
+  anc.regioes.forEach((r,i) => {
+    bars += `<div class="anc-item"><div class="anc-row"><span class="anc-name">${r.regiao}</span><span class="anc-pct">${r.porcentagem}%</span></div><div class="anc-track"><div class="anc-fill" style="width:${r.porcentagem}%;animation-delay:${i*.12}s"></div></div></div>`;
+  });
   document.getElementById('ancBars').innerHTML = bars;
-
-  // Texto livre (parte 1)
   document.getElementById('ancText').innerHTML = anc.narrativa.split('\n\n').map(p=>`<p>${p}</p>`).join('');
+  document.getElementById('ancBlur').innerHTML = anc.narrativa_completa.split('\n\n').map(p=>`<p>${p}</p>`).join('');
 
-  // Blur (parte 2)
-  document.getElementById('ancBlurText').innerHTML = anc.narrativa_completa.split('\n\n').map(p=>`<p>${p}</p>`).join('');
-
-  // Botão para numerologia
   document.getElementById('btnToNum').onclick = () => { renderNumerology(); go('s-numerology'); };
 }
 
-// ── RENDER NUMEROLOGY ──
+// ── Render Numerology ──
 function renderNumerology() {
   const data = S.result; const num = data.numerologia;
   const d = new Date(S.date+'T00:00:00');
@@ -606,154 +756,141 @@ function renderNumerology() {
   document.getElementById('numName').textContent = S.name.split(' ').slice(0,2).join(' ');
   document.getElementById('numDate').textContent = ds;
 
-  // Cálculo explicado (calculado localmente — 100% real)
-  document.getElementById('calcBox').innerHTML = buildCalcBox(S.name, S.date);
+  document.getElementById('calcBox').innerHTML = buildCalcBox(S.name);
 
-  // Tabela
   document.getElementById('numTable').innerHTML = `
-    <tr><td>Expressão / Destino</td><td><span class="num-big">${num.expressao}</span> — ${num.expressao_nome}</td></tr>
-    <tr><td>Caminho de Vida</td><td><span class="num-big">${num.caminho_vida}</span> — ${num.caminho_nome}</td></tr>
-    <tr><td>Número da Alma</td><td><span class="num-big">${num.alma}</span> — ${num.alma_nome}</td></tr>
-    <tr><td>Personalidade</td><td><span class="num-big">${num.personalidade}</span> — ${num.personalidade_nome}</td></tr>
-    <tr><td>Ano Pessoal ${new Date().getFullYear()}</td><td><span class="num-big">${num.ano_pessoal}</span> — ${num.ano_pessoal_tema}</td></tr>
+    <tr><td>Expressão / Destino</td><td><span class="num-big">${num.expressao}</span>${num.expressao_nome}</td></tr>
+    <tr><td>Caminho de Vida</td><td><span class="num-big">${num.caminho_vida}</span>${num.caminho_nome}</td></tr>
+    <tr><td>Alma / Motivação</td><td><span class="num-big">${num.alma}</span>${num.alma_nome}</td></tr>
+    <tr><td>Personalidade</td><td><span class="num-big">${num.personalidade}</span>${num.personalidade_nome}</td></tr>
+    <tr><td>Ano Pessoal ${new Date().getFullYear()}</td><td><span class="num-big">${num.ano_pessoal}</span>${num.ano_pessoal_tema}</td></tr>
   `;
 
-  // Personalidade título e texto
-  document.getElementById('numPersonTitle').textContent = `Número ${num.expressao} — ${num.expressao_nome}`;
-  document.getElementById('numPersonText').innerHTML = num.personalidade_analise.split('\n\n').map(p=>`<p>${p}</p>`).join('');
+  document.getElementById('numLayerTitle').textContent = `${S.name.split(' ')[0]} — Número ${num.expressao}`;
+  document.getElementById('numLayerText').innerHTML = num.personalidade_analise.split('\n\n').map(p=>`<p>${p}</p>`).join('');
 
-  // Virtudes (visíveis)
+  // Virtudes
   let vHtml = '';
-  num.virtudes.forEach(v=>{ vHtml+=`<div class="trait-card virtue"><div class="trait-card-label">Virtude</div><div class="trait-card-name">${v.nome}</div><div class="trait-card-desc">${v.desc}</div></div>`; });
-  document.getElementById('virtueGrid').innerHTML = vHtml;
+  num.virtudes.forEach(v => {
+    vHtml += `<div class="layer-card virtue"><div class="layer-tag">Força</div><div class="layer-name">${v.nome}</div><div class="layer-desc">${v.desc}</div></div>`;
+  });
+  document.getElementById('virtueCards').innerHTML = vHtml;
 
-  // Defeitos (blur)
+  // Blur: defeitos
   let fHtml = '';
-  num.defeitos.forEach(f=>{ fHtml+=`<div class="trait-card flaw"><div class="trait-card-label">Desafio</div><div class="trait-card-name">${f.nome}</div><div class="trait-card-desc">${f.desc}</div></div>`; });
-  document.getElementById('flawGrid').innerHTML = fHtml;
+  num.defeitos.forEach(f => {
+    fHtml += `<div class="layer-card flaw" style="margin-bottom:10px"><div class="layer-tag">Sombra</div><div class="layer-name">${f.nome}</div><div class="layer-desc">${f.desc}</div></div>`;
+  });
+  num.pontos_cegos.forEach(p => {
+    fHtml += `<div class="layer-card blind" style="margin-bottom:10px"><div class="layer-tag">Ponto Cego</div><div class="layer-name">${p.nome}</div><div class="layer-desc">${p.desc}</div></div>`;
+  });
+  document.getElementById('flawBlur').innerHTML = fHtml;
 
-  // Missão
-  document.getElementById('numMission').innerHTML = num.missao_vida.split('\n\n').map(p=>`<p>${p}</p>`).join('');
-
-  // Liderança radar (blur)
-  let radar = '';
-  num.lideranca.habilidades.forEach(h=>{ radar+=`<div class="radar-item"><span class="radar-label">${h.nome}</span><div class="radar-bar"><div class="radar-fill" style="width:${h.valor}%"></div></div><span class="radar-val">${h.valor}</span></div>`; });
-  document.getElementById('radarWrap').innerHTML = radar;
-  document.getElementById('leaderText').innerHTML = num.lideranca.analise.split('\n\n').map(p=>`<p>${p}</p>`).join('');
+  // Blur: persuasão
+  document.getElementById('persuasionBlur').innerHTML = `<div class="long-text">${num.persuasao.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`;
 
   // Paywall sub
-  document.getElementById('pwSub').textContent = `${S.name.split(' ')[0]}, você viu apenas metade do seu mapa. O relatório completo revela seus desafios, potencial de liderança, relacionamentos e como você pode usar tudo isso a seu favor.`;
+  document.getElementById('pwSub').textContent = `${S.name.split(' ')[0]}, você viu apenas o começo. O mapa completo revela seus padrões ocultos, pontos cegos, vulnerabilidades e seu propósito real.`;
 }
 
-// ── PAYMENT ──
+// ── Payment ──
 function handlePayment() {
-  window.open(MP,'_blank');
-  setTimeout(()=>{ if(confirm('Após o pagamento, clique OK para liberar seu relatório.')) renderFull(); },2000);
+  window.open(MP, '_blank');
+  setTimeout(() => {
+    if (confirm('Após o pagamento, clique OK para liberar seu relatório completo.')) renderFull();
+  }, 2000);
 }
 
-// ── FULL REPORT ──
+// ── Full Report ──
 function renderFull() {
   const data = S.result; const anc = data.ancestralidade; const num = data.numerologia;
-  const container = document.getElementById('fullContent');
-  container.innerHTML = '';
+  const cont = document.getElementById('fullContent');
+  cont.innerHTML = '';
 
   const sections = [
     {
-      label:'Mapa Cabalístico',
-      title:'Seus Números Revelados',
-      html:`
-        ${buildCalcBox(S.name,S.date)}
-        <table class="num-table" style="margin-top:16px">
-          <tr><td>Expressão</td><td><span class="num-big">${num.expressao}</span> — ${num.expressao_nome}</td></tr>
-          <tr><td>Caminho de Vida</td><td><span class="num-big">${num.caminho_vida}</span> — ${num.caminho_nome}</td></tr>
-          <tr><td>Alma</td><td><span class="num-big">${num.alma}</span> — ${num.alma_nome}</td></tr>
-          <tr><td>Personalidade</td><td><span class="num-big">${num.personalidade}</span> — ${num.personalidade_nome}</td></tr>
-          <tr><td>Ano Pessoal</td><td><span class="num-big">${num.ano_pessoal}</span></td></tr>
-        </table>`
-    },
-    {
-      label:'Ancestralidade Completa',
-      title:'Sua Origem Ancestral',
-      html:`
-        ${anc.regioes.map((r,i)=>`<div class="anc-item"><div class="anc-row"><span class="anc-name">${r.regiao}</span><span class="anc-pct">${r.porcentagem}%</span></div><div class="anc-bar"><div class="anc-fill" style="width:${r.porcentagem}%;animation-delay:${i*.1}s"></div></div></div>`).join('')}
-        <div class="divider" style="margin:20px 0">· · ·</div>
+      label: 'Origem Ancestral',
+      title: 'Mapa Ancestral Completo',
+      html: `
+        ${anc.regioes.map((r,i)=>`<div class="anc-item"><div class="anc-row"><span class="anc-name">${r.regiao}</span><span class="anc-pct">${r.porcentagem}%</span></div><div class="anc-track"><div class="anc-fill" style="width:${r.porcentagem}%;animation-delay:${i*.1}s"></div></div></div>`).join('')}
+        <div class="divider"><span>·</span></div>
         <div class="long-text">${anc.narrativa_completa.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
     },
     {
-      label:'Personalidade',
-      title:'Virtudes e Desafios',
-      html:`
-        <div class="long-text" style="margin-bottom:20px">${num.personalidade_analise.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>
-        <p class="eyebrow" style="color:#4A8C5C;margin-bottom:10px">Virtudes</p>
-        <div class="trait-grid">${num.virtudes.map(v=>`<div class="trait-card virtue"><div class="trait-card-label">Virtude</div><div class="trait-card-name">${v.nome}</div><div class="trait-card-desc">${v.desc}</div></div>`).join('')}</div>
-        <p class="eyebrow" style="color:var(--red);margin:20px 0 10px">Desafios e Sombras</p>
-        <div class="trait-grid">${num.defeitos.map(f=>`<div class="trait-card flaw"><div class="trait-card-label">Desafio</div><div class="trait-card-name">${f.nome}</div><div class="trait-card-desc">${f.desc}</div></div>`).join('')}</div>
-        <div class="divider" style="margin:20px 0">· · ·</div>
+      label: 'Camada I · Psicologia',
+      title: 'Quem Você É Por Dentro',
+      html: `
+        <div class="long-text">${num.personalidade_analise.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>
+        <div class="divider"><span>·</span></div>
+        <p class="eyebrow" style="color:var(--green-light);margin-bottom:12px">Forças Internas</p>
+        ${num.virtudes.map(v=>`<div class="layer-card virtue" style="margin-bottom:10px"><div class="layer-tag">Força</div><div class="layer-name">${v.nome}</div><div class="layer-desc">${v.desc}</div></div>`).join('')}`
+    },
+    {
+      label: 'Camada II · Sombras',
+      title: 'Seus Padrões Ocultos e Pontos Cegos',
+      html: `
+        <p class="eyebrow" style="color:var(--red-light);margin-bottom:12px">Sombras</p>
+        ${num.defeitos.map(f=>`<div class="layer-card flaw" style="margin-bottom:10px"><div class="layer-tag">Sombra</div><div class="layer-name">${f.nome}</div><div class="layer-desc">${f.desc}</div></div>`).join('')}
+        <p class="eyebrow" style="color:var(--purple-light);margin:20px 0 12px">Pontos Cegos</p>
+        ${num.pontos_cegos.map(p=>`<div class="layer-card blind" style="margin-bottom:10px"><div class="layer-tag">Ponto Cego</div><div class="layer-name">${p.nome}</div><div class="layer-desc">${p.desc}</div></div>`).join('')}
+        <div class="divider"><span>·</span></div>
         <div class="long-text">${num.sombra_analise.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
     },
     {
-      label:'Liderança',
-      title:'Seu Potencial de Liderança',
-      html:`
-        <div class="radar-wrap">${num.lideranca.habilidades.map(h=>`<div class="radar-item"><span class="radar-label">${h.nome}</span><div class="radar-bar"><div class="radar-fill" style="width:${h.valor}%"></div></div><span class="radar-val">${h.valor}</span></div>`).join('')}</div>
-        <div class="divider" style="margin:20px 0">· · ·</div>
+      label: 'Camada III · Persuasão',
+      title: 'Onde Você é Persuadido e Manipulado',
+      html: `<div class="long-text">${num.persuasao.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
+    },
+    {
+      label: 'Camada IV · Propósito',
+      title: 'Suas Metas e Propósito de Vida',
+      html: `<div class="long-text">${num.missao_vida.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
+    },
+    {
+      label: 'Camada V · Amor',
+      title: 'Relacionamentos e Padrões Afetivos',
+      html: `<div class="long-text">${num.amor.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
+    },
+    {
+      label: 'Camada VI · Liderança',
+      title: 'Seu Potencial de Liderança',
+      html: `
+        <div style="margin-bottom:20px">${num.lideranca.habilidades.map(h=>`<div class="radar-item"><span class="radar-label">${h.nome}</span><div class="radar-track"><div class="radar-fill" style="width:${h.valor}%"></div></div><span class="radar-num">${h.valor}</span></div>`).join('')}</div>
         <div class="long-text">${num.lideranca.analise.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
     },
     {
-      label:'Persuasão',
-      title:'Como Você é Influenciado',
-      html:`<div class="long-text">${num.persuasao.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
-    },
-    {
-      label:'Amor',
-      title:'Relacionamentos e Compatibilidade',
-      html:`<div class="long-text">${num.amor.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
-    },
-    {
-      label:'Vocações',
-      title:'Talentos e Caminhos de Vida',
-      html:`<div class="long-text">${num.vocacoes.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
-    },
-    {
-      label:`Ano Pessoal ${new Date().getFullYear()}`,
-      title:'Previsão e Orientações',
-      html:`<div class="long-text">${num.ano_pessoal_analise.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
-    },
-    {
-      label:'Missão',
-      title:'Sua Missão de Vida',
-      html:`<div class="long-text" style="font-style:italic;color:var(--text-mid);border-left:2px solid var(--gold-dim);padding-left:20px">${num.missao_vida.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
+      label: `Ano Pessoal ${new Date().getFullYear()}`,
+      title: 'Previsão e Orientações do Ciclo Atual',
+      html: `<div class="long-text">${num.ano_pessoal_analise.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
     }
   ];
 
-  sections.forEach((sec,i)=>{
+  sections.forEach((sec,i) => {
     const div = document.createElement('div');
-    div.className = 'full-section';
-    div.style.animationDelay = (i*.12)+'s';
-    div.innerHTML = `<p class="fs-label">${sec.label}</p><h3 class="fs-title">${sec.title}</h3>${sec.html}`;
-    container.appendChild(div);
+    div.className = 'report-section';
+    div.style.animationDelay = (i*.1)+'s';
+    div.innerHTML = `<p class="rs-eyebrow">${sec.label}</p><h3 class="rs-title">${sec.title}</h3>${sec.html}`;
+    cont.appendChild(div);
   });
 
-  const shareDiv = document.createElement('div');
-  shareDiv.style.cssText='text-align:center;padding:12px 0 20px;width:100%;max-width:420px;';
-  shareDiv.innerHTML=`<p style="font-size:12px;letter-spacing:2px;color:var(--gold-dim);margin-bottom:14px;text-transform:uppercase">Compartilhe</p><button class="btn" style="max-width:260px;margin:0 auto" onclick="shareResult()">📤 COMPARTILHAR</button>`;
-  container.appendChild(shareDiv);
+  const share = document.createElement('div');
+  share.style.cssText = 'text-align:center;padding:8px 0 20px;width:100%;max-width:440px';
+  share.innerHTML = `<p class="eyebrow" style="margin-bottom:14px">Compartilhe</p><button class="btn-primary" style="max-width:240px;margin:0 auto" onclick="shareResult()">📤 COMPARTILHAR MEU MAPA</button>`;
+  cont.appendChild(share);
   go('s-full');
 }
 
 function shareResult() {
-  const txt = `Descobri minha origem ancestral e mapa cabalístico! Herança: ${S.result?.ancestralidade?.regioes?.[0]?.regiao}, Número de Expressão: ${S.result?.numerologia?.expressao}. Descubra o seu!`;
-  if(navigator.share) navigator.share({title:'AncestralIA',text:txt,url:window.location.href});
+  const txt = `Descobri meu mapa ancestral e psicológico no AncestralIA. Minha herança dominante é ${S.result?.ancestralidade?.regioes?.[0]?.regiao} e meu número de Expressão é ${S.result?.numerologia?.expressao}. Descubra o seu!`;
+  if (navigator.share) navigator.share({title:'AncestralIA',text:txt,url:window.location.href});
   else { navigator.clipboard?.writeText(window.location.href); alert('Link copiado!'); }
 }
 
 // ── FALLBACK ──
 function fallback(name, date) {
-  const nc = calcName(name); const dc = calcDate(date);
-  const archetypes = {1:'O Líder',2:'O Diplomata',3:'O Criativo',4:'O Construtor',5:'O Aventureiro',6:'O Guardião',7:'O Místico',8:'O Realizador',9:'O Humanitário',11:'O Iluminado',22:'O Mestre Construtor',33:'O Mestre Curador'};
-  const themes = {1:'Independência e Iniciativa',2:'Cooperação e Harmonia',3:'Expressão e Alegria',4:'Estabilidade e Disciplina',5:'Liberdade e Mudança',6:'Amor e Responsabilidade',7:'Espiritualidade e Análise',8:'Poder e Abundância',9:'Compaixão e Conclusão',11:'Intuição e Iluminação',22:'Construção de Legado',33:'Cura e Ensinamento'};
-  const exp = nc.expressao; const cam = dc.caminho; const alm = nc.alma; const pers = nc.personalidade; const ano = dc.anoP;
-
+  const nums = calcNumbers(name, date);
+  const arch = {1:'O Líder',2:'O Diplomata',3:'O Criativo',4:'O Construtor',5:'O Aventureiro',6:'O Guardião',7:'O Místico',8:'O Realizador',9:'O Humanitário',11:'O Iluminado',22:'O Mestre',33:'O Curador'};
+  const n = nums.expressao;
   return {
     ancestralidade:{
       regioes:[
@@ -761,44 +898,49 @@ function fallback(name, date) {
         {regiao:'Oriente Médio',porcentagem:17},{regiao:'Ameríndio',porcentagem:11},
         {regiao:'Ásia do Sul',porcentagem:5},{regiao:'Norte da Europa',porcentagem:3}
       ],
-      heranca_cultural:'Africana, Ibérica e Indígena',
-      narrativa:`Sua face carrega a sabedoria de civilizações que ergueram pirâmides e navegaram oceanos desconhecidos. Das margens do Rio Níger aos templos de Roma, seus ancestrais foram construtores de impérios e guardiões de verdades sagradas.\n\nO sangue que corre em suas veias foi temperado por séculos de sol africano e ventos mediterrâneos. Há em seus traços a memória de povos que resistiram ao tempo, que atravessaram desertos e mares inteiros em busca de algo maior que si mesmos.`,
-      narrativa_completa:`Sua face carrega a sabedoria de civilizações que ergueram pirâmides e navegaram oceanos desconhecidos. Das margens do Rio Níger aos templos de Roma, seus ancestrais foram construtores de impérios e guardiões de verdades sagradas.\n\nA herança africana que pulsa em você traz a força das savanas, a sabedoria dos griots e a espiritualidade profunda dos povos que primeiro olharam para as estrelas e lhes deram nome.\n\nA herança europeia acrescenta a curiosidade dos navegadores, a disciplina dos construtores de catedrais e a busca filosófica pelo belo e pelo verdadeiro.\n\nA linha indígena conecta você à terra, ao sagrado nos elementos e à sabedoria dos ciclos naturais — um conhecimento que atravessa gerações oralmente.\n\nVocê é a síntese de povos que nunca se renderam. Cada traço do seu rosto conta uma história de resistência, beleza e sabedoria ancestral que transcende gerações.`
+      narrativa:`Sua face carrega a memória de civilizações que ergueram pirâmides e navegaram oceanos desconhecidos. Das margens do Rio Níger aos templos ibéricos, seus ancestrais foram construtores de impérios.\n\nHá em seus traços a síntese de povos que resistiram ao tempo — africanos que guardaram o conhecimento das estrelas, ibéricos que cruzaram o Atlântico movidos por uma fome insaciável de horizontes.\n\nVocê não é uma pessoa apenas. Você é o ponto de encontro de jornadas épicas que atravessaram séculos e continentes para culminar em quem você é hoje.`,
+      narrativa_completa:`A herança africana que pulsa em você vem especificamente das civilizações do Sahel e da Costa Ocidental — povos que desenvolveram sistemas filosóficos, musicais e espirituais de extraordinária sofisticação antes mesmo da ascensão das grandes civilizações europeias.\n\nA linha ibérica traz o sangue dos navegadores — pessoas que olharam para o horizonte e decidiram atravessá-lo. Essa herança se manifesta em você como uma inquietação produtiva, uma incapacidade de se contentar com o suficiente.\n\nO traço indígena conecta você à terra — à sabedoria dos ciclos, ao sagrado na natureza, ao conhecimento transmitido oralmente por gerações. Há em você uma sensibilidade ecológica que vai além da ideologia.\n\nO sangue do Oriente Médio traz a tradição dos comerciantes e filósofos — povos que desenvolveram o álgebra, a astronomia e as primeiras formas de escrita. Isso se manifesta em você como um talento natural para encontrar padrões onde outros veem caos.\n\nVocê é, literalmente, a síntese de civilizações que nunca se renderam. Cada traço do seu rosto é um arquivo vivo de resistência, beleza e sabedoria ancestral.`
     },
     numerologia:{
-      expressao:exp, expressao_nome:archetypes[exp]||'O Buscador',
-      caminho_vida:cam, caminho_nome:archetypes[cam]||'O Viajante',
-      alma:alm, alma_nome:archetypes[alm]||'O Sonhador',
-      personalidade:pers, personalidade_nome:archetypes[pers]||'O Reservado',
-      ano_pessoal:ano, ano_pessoal_tema:themes[ano]||'Transformação',
-      personalidade_analise:`O Número de Expressão ${exp} — ${archetypes[exp]||'O Buscador'} — é calculado a partir de todas as letras do seu nome completo segundo o sistema cabalístico. Este número revela sua essência mais profunda: quem você é no núcleo, independente das circunstâncias externas.\n\nHá em você uma profundidade rara. Você não se satisfaz com respostas superficiais — precisa compreender o porquê por trás do porquê. Isso te faz lento para decidir às vezes, mas quando você age, é com convicção.\n\nO número ${exp} também indica uma tendência natural à introspecção produtiva. Você processa o mundo internamente antes de agir externamente — e isso é uma força enorme, não uma fraqueza.`,
+      expressao:n, expressao_nome:arch[n]||'O Buscador',
+      caminho_vida:nums.caminho, caminho_nome:arch[nums.caminho]||'O Caminhante',
+      alma:nums.alma, alma_nome:arch[nums.alma]||'O Sonhador',
+      personalidade:nums.personalidade, personalidade_nome:arch[nums.personalidade]||'O Reservado',
+      ano_pessoal:nums.anoP, ano_pessoal_tema:'Transformação e Clareza',
+      personalidade_analise:`O número ${n} que emerge do seu nome completo no sistema cabalístico revela uma estrutura psicológica singular. Você processa o mundo de dentro para fora — primeiro sente, depois analisa, e só então age. Esse ritmo interno, frequentemente incompreendido pelos outros, é na verdade uma forma superior de processamento.\n\nHá em você uma profundidade que assusta quem está acostumado com relações superficiais. Você percebe nuances que passam despercebidas para a maioria — uma entonação, um silêncio, uma contradição entre o que é dito e o que é sentido. Isso te faz um observador extraordinário, mas às vezes um relacionador relutante.\n\nSua maior força interna é a capacidade de ir ao cerne das questões. Enquanto outros ficam na superfície, você instintivamente mergulha. Isso cria uma riqueza interior vasta, mas também uma solidão específica — a de quem enxerga mais do que consegue compartilhar com palavras.`,
       virtudes:[
-        {nome:'Profundidade Intelectual',desc:'Você vai além da superfície em tudo que estuda ou analisa. Vê padrões que outros ignoram.'},
-        {nome:'Fidelidade',desc:'Quando você se compromete, honra esse compromisso. Sua palavra tem peso.'},
-        {nome:'Percepção Intuitiva',desc:'Você sente quando algo está errado antes de poder explicar racionalmente. Confie mais nisso.'}
+        {nome:'Profundidade Analítica',desc:'Você enxerga padrões que outros ignoram. Em conversas, você ouve o que não foi dito. Em problemas, você encontra a causa raiz enquanto outros ainda tratam os sintomas. Essa capacidade te torna inestimável em qualquer contexto que exija diagnóstico real.'},
+        {nome:'Lealdade Inabalável',desc:'Quando você decide confiar em alguém, essa confiança é total. Você não abandona as pessoas nos momentos difíceis. Sua palavra tem peso porque você sabe que terá que honrá-la — e essa consciência te torna seletivo com seus compromissos.'},
+        {nome:'Intuição Calibrada',desc:'Sua intuição não é mística — ela é o resultado de anos de observação não-consciente sendo processada. Quando você sente que algo está errado, quase invariavelmente está. Aprender a confiar nesse sinal, mesmo sem conseguir explicá-lo racionalmente, é um dos seus maiores presentes.'},
+        {nome:'Integridade Estrutural',desc:'Você tem dificuldade genuína em agir contra seus valores. Isso pode parecer rigidez para outros, mas é na verdade uma forma de saúde psicológica rara — você sabe quem é e não negocia isso facilmente.'}
       ],
       defeitos:[
-        {nome:'Isolamento',desc:'Sua profundidade pode se tornar distância. Você tende a se fechar quando deveria se abrir.'},
-        {nome:'Perfeccionismo Paralisante',desc:'A busca pelo ideal pode impedir a ação. Feito é melhor que perfeito.'},
-        {nome:'Dificuldade em Pedir Ajuda',desc:'Você prefere resolver tudo sozinho, mesmo quando ajuda tornaria tudo mais fácil.'}
+        {nome:'Isolamento Defensivo',desc:'Quando se sente ameaçado ou incompreendido, você se fecha. O problema é que você se fecha também quando poderia se abrir com segurança. Para superar isso: pratique revelar pequenas vulnerabilidades progressivamente, antes de precisar revelar as grandes.'},
+        {nome:'Perfeccionismo Paralisante',desc:'Sua exigência de qualidade pode se tornar um escudo contra a ação. "Não está pronto ainda" frequentemente significa "tenho medo de ser julgado". Para superar: estabeleça prazos externos e honre-os mesmo que o resultado não seja perfeito.'},
+        {nome:'Dificuldade com Autoridade Arbitrária',desc:'Você respeita competência, não hierarquia. Isso é saudável, mas pode criar conflitos desnecessários com figuras de autoridade que não merecem seu respeito mas têm poder sobre você. Para superar: separe o jogo político da sua avaliação moral.'},
+        {nome:'Ruminação Crônica',desc:'Sua mente não desliga facilmente. Você revive conversas, reconstrói cenários, analisa o que poderia ter dito diferente. Para superar: estabeleça um "horário de preocupação" — 20 minutos por dia onde você pensa sobre o que quiser, e conscientemente interrompe a ruminação fora desse horário.'}
       ],
-      sombra_analise:`Todo número carrega uma sombra — o lado que precisa ser reconhecido e integrado, não suprimido. Para o número ${exp}, a sombra se manifesta principalmente no isolamento e no perfeccionismo.\n\nReconhecer seus defeitos não é fraqueza — é o primeiro passo para transformá-los em sabedoria. O isolamento, quando consciente, se torna retiro produtivo. O perfeccionismo, quando dirigido, se torna excelência.\n\nA numerologia cabalística ensina que nossas sombras são apenas virtudes ainda não integradas. Seu trabalho não é eliminar esses traços, mas aprender a usá-los com consciência.`,
-      missao_vida:`Sua missão nesta vida é construir pontes entre o conhecimento profundo e as pessoas ao seu redor. Você nasceu para guiar, ensinar e revelar verdades que outros não conseguem enxergar sozinhos.\n\nO mundo precisa da sua perspectiva única — da sua capacidade de ir fundo onde outros ficam na superfície. Você é um farol para aqueles que buscam compreender algo maior que si mesmos.`,
+      pontos_cegos:[
+        {nome:'Superestima sua Objetividade',desc:'Você acredita que é mais racional do que é. Na verdade, suas decisões mais importantes são emocionalmente motivadas — mas você constrói narrativas racionais depois. Reconhecer isso não te torna menos inteligente; te torna mais honesto.'},
+        {nome:'Subestima o Impacto do seu Silêncio',desc:'Quando você não diz nada, as pessoas não interpretam isso como neutralidade — interpretam como julgamento, desinteresse ou rejeição. Seu silêncio tem um peso que você frequentemente não percebe.'},
+        {nome:'Confunde Solidão com Independência',desc:'Você valoriza sua autonomia genuinamente, mas às vezes usa o discurso da independência para evitar a vulnerabilidade da interdependência. Você precisa de conexão tanto quanto qualquer pessoa — só tem mais dificuldade de admitir isso.'}
+      ],
+      sombra_analise:`A sombra psicológica — conceito de Carl Jung — é a parte de nós que preferimos não ver. Para o número ${n}, a sombra principal é o medo do fracasso público. Não do fracasso em si — você consegue processar erros internamente com relativa saúde. O medo é de falhar diante dos outros, de ser visto como menos do que a imagem cuidadosamente construída.\n\nEsse medo opera de forma sutil: ele te faz procrastinar não por preguiça, mas para preservar a possibilidade de que "se eu tentasse de verdade, eu conseguiria". Enquanto você não tenta de verdade, essa possibilidade permanece intacta.\n\nIntegrar essa sombra significa reconhecer que sua autoestima não pode depender da ausência de fracassos visíveis. Pessoas que admiramos genuinamente não são aquelas que nunca falharam — são aquelas que falharam visivelmente e continuaram. Essa coragem de falhar em público é o que você mais precisa desenvolver.`,
+      missao_vida:`Você veio a este plano com uma tarefa específica: transformar conhecimento profundo em sabedoria acessível. Não é suficiente saber — você nasceu para fazer com que outros também saibam. Essa missão pode se manifestar como ensino formal, como liderança, como escrita, como mentoria, como arte — a forma importa menos do que o ato de traduzir o que você vê no invisível para o que outros podem ver no visível.\n\nA tensão central da sua missão é que você prefere pensar a comunicar, e prefere compreender a ensinar. Mas seu propósito exige que você quebre essa preferência repetidamente — que você saia da contemplação e entre na transmissão.\n\nO legado que você pode deixar é genuinamente transformador. Quando você está no seu melhor, as pessoas saem das conversas com você tendo visto algo que não conseguiam ver antes. Esse é o seu dom mais raro — e sua maior responsabilidade.`,
+      persuasao:`Com sua combinação de números, você não é movido por pressão social direta. Na verdade, pressão explícita cria resistência automática em você — quanto mais alguém tenta te convencer com urgência artificial, mais cético você fica. Você detecta manipulação com facilidade e a rejeita visceralmente.\n\nO que genuinamente te move é a qualidade intelectual do argumento combinada com a credibilidade demonstrada de quem fala. Você responde a pessoas que provam competência antes de pedir confiança. A sequência certa para te persuadir é: demonstrar conhecimento → mostrar resultados reais → apresentar a proposta. Qualquer outra ordem encontra resistência.\n\nSeu segundo gatilho de persuasão é a narrativa de profundidade. Quando algo é apresentado como parte de um sistema maior, como algo que vai além do superficial, você sente atração quase automática. Você não quer produtos — você quer entender como as coisas funcionam por dentro.\n\nUsando esse conhecimento a seu favor: quando você sentir aquela atração por uma ideia "profunda", pause. Pergunte: "Isso é genuinamente profundo, ou está apenas usando a linguagem da profundidade para me vender algo?" A diferença é que o profundo genuíno te deixa com mais perguntas. O superficial disfarçado te deixa com todas as respostas.`,
+      amor:`No amor, você busca uma coisa acima de tudo: ser completamente compreendido. Não apenas aceito — compreendido. Há uma diferença crucial: aceitação pode vir sem entendimento real, mas você consegue sentir a diferença. O que você busca é alguém que veja exatamente quem você é — incluindo as partes que você mesmo tem dificuldade de ver — e escolha ficar.\n\nSeu padrão de autossabotagem mais frequente é o teste inconsciente. Você coloca barreiras sutis para ver se a pessoa vai superá-las. O problema é que pessoas saudáveis frequentemente não percebem que estão sendo testadas — e simplesmente saem. Você então interpreta a saída como confirmação de que "pessoas sempre vão embora", quando na verdade você as afastou.\n\nVocê tem maior compatibilidade com pessoas que combinam profundidade intelectual com estabilidade emocional — números 4, 7 e 9 geralmente criam ressonância. Pessoas com número 3 trazem a leveza que você precisa mas frequentemente rejeita. Número 1 pode criar atração intensa mas conflito crônico de egos.`,
       lideranca:{
         habilidades:[
           {nome:'Visão Estratégica',valor:88},
-          {nome:'Influência Natural',valor:74},
-          {nome:'Gestão de Conflitos',valor:61},
-          {nome:'Comunicação',valor:79},
-          {nome:'Tomada de Decisão',valor:83},
-          {nome:'Inteligência Emocional',valor:71}
+          {nome:'Análise de Situação',valor:91},
+          {nome:'Influência por Credibilidade',valor:78},
+          {nome:'Gestão de Conflitos',valor:62},
+          {nome:'Comunicação Direta',valor:71},
+          {nome:'Inteligência Emocional',valor:74}
         ],
-        analise:`Sua liderança não é do tipo que impõe — é do tipo que inspira. Você lidera pelo exemplo e pela profundidade, não pela autoridade ou pelo volume. Isso cria seguidores genuinamente leais, não apenas obedientes.\n\nO ponto forte da sua liderança é a visão estratégica: você enxerga o longo prazo quando outros estão perdidos no imediato. O ponto de desenvolvimento é a comunicação — traduzir sua visão interna em palavras que outros compreendam imediatamente.\n\nVocê prospera em papéis onde pode pensar, analisar e depois agir com convicção. Ambientes caóticos e reativos drenam sua energia. Busque estruturas que respeitem seu ritmo de processamento.`
+        analise:`Você lidera pelo que sabe, não pelo que proclama. Sua autoridade emerge naturalmente da competência demonstrada — quando as pessoas percebem que você entende mais do que está dizendo, elas passam a ouvir com atenção diferente. Esse tipo de liderança é mais lento para se estabelecer, mas infinitamente mais durável.\n\nSeu ponto cego de liderança é a comunicação emocional. Você consegue explicar o que precisa ser feito com clareza rara, mas frequentemente subestima quanto as pessoas precisam sentir que são vistas, não apenas instruídas. Um líder que só informa cria eficiência; um líder que também conecta cria comprometimento.\n\nVocê prospera em ambientes onde pode pensar antes de falar, onde suas contribuições são avaliadas pela qualidade e não pela velocidade, e onde a hierarquia é baseada em competência. Ambientes políticos e de alta performance social drenam sua energia vital rapidamente.`
       },
-      persuasao:`Com sua combinação numerológica, você não é facilmente movido por pressão emocional superficial ou apelos ao ego. O que genuinamente move você é a profundidade intelectual combinada com propósito ético.\n\nArgumentos lógicos, bem fundamentados e conectados a um impacto maior no mundo penetram suas defesas naturais. Você responde a quem demonstra conhecimento genuíno e intenção honesta — e detecta manipulação com facilidade.\n\nSeu gatilho mais poderoso é a narrativa de legado: "isso vai durar, isso vai importar". Quando algo é apresentado como parte de algo maior e mais duradouro, você sente uma atração quase irresistível.\n\nUsar esse conhecimento a seu favor significa fazer uma pausa antes de grandes decisões e se perguntar: "Isso realmente se alinha aos meus valores mais profundos, ou estou sendo movido por uma narrativa bem construída?"`,
-      amor:`No amor, você busca profundidade acima de tudo. Relacionamentos superficiais não te sustentam por muito tempo — você precisa de alguém com quem possa mergulhar em conversas que durem até o amanhecer.\n\nSua maior dificuldade afetiva é se abrir no tempo certo. Você tende a testar as pessoas indiretamente antes de mostrar sua vulnerabilidade real. Isso é uma proteção legítima, mas pode afastar quem seria seu par perfeito.\n\nNumerologicamente, você possui maior harmonia com pessoas dos números 3, 5 e 9. O 3 traz leveza à sua seriedade. O 5 oferece a aventura que seu lado oculto deseja. O 9 compartilha sua visão ampliada do mundo e sua motivação em contribuir com algo maior.`,
-      vocacoes:`Sua combinação numerológica aponta para vocações ligadas ao conhecimento profundo, à investigação e à transformação. Áreas como psicologia, filosofia, pesquisa, medicina, espiritualidade, escrita e ensino ressoam naturalmente com sua essência.\n\nHá também um forte potencial criativo que pode se manifestar nas artes, na música, no cinema ou na comunicação. O número da sua Alma pede expressão criativa — quando você encontra um canal para isso, sua produtividade e satisfação aumentam dramaticamente.\n\nO mais importante: você prospera em trabalhos que permitem profundidade e autonomia. Ambientes que exigem resposta imediata e superficial drenam sua energia vital. Você foi feito para ir fundo — encontre campos que recompensem isso.`,
-      ano_pessoal_analise:`Você está em um Ano Pessoal ${ano} — ${themes[ano]||'de transformação'}. Este é um ciclo com características muito específicas que merecem atenção.\n\nAs oportunidades deste ano estão ligadas diretamente ao tema do número ${ano}. Projetos iniciados agora têm potencial de crescimento sólido se alinhados com essa energia.\n\nO conselho numerológico para este ciclo: preste atenção nos padrões que se repetem — eles estão tentando te ensinar algo. O ano pessoal é um professor, não um destino fixo. Você tem livre-arbítrio para trabalhar com ou contra essa energia.`
+      ano_pessoal_analise:`O Ano Pessoal ${nums.anoP} que você está vivendo em ${new Date().getFullYear()} é um ciclo de consolidação — não de grandes expansões, mas de aprofundamento do que já foi iniciado. A energia deste ano favorece quem está disposto a fazer o trabalho interno que outros adiam.\n\nAs oportunidades principais deste ciclo estão em relacionamentos que já existem — aprofundá-los, repará-los ou encerrá-los com clareza. É também um ano favorável para aprendizado formal ou sistematizado — qualquer coisa que você estuda agora vai se fixar com profundidade incomum.\n\nO maior risco do Ano ${nums.anoP} para o seu perfil específico é o isolamento excessivo. A energia introspectiva do ciclo pode amplificar sua tendência natural ao recolhimento. A orientação prática: mantenha pelo menos um compromisso social por semana que você não possa cancelar — mesmo que não queira ir, o contato vai te nutrir de formas que você só vai reconhecer depois.`
     }
   };
 }

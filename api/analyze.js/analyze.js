@@ -1,175 +1,169 @@
 const CABAL = {A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
 const VOWELS = new Set(['A','E','I','O','U']);
-
-function normalize(s) {
-  return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z]/g,' ');
-}
-
-function reduce(n) {
-  if (n === 11 || n === 22 || n === 33) return n;
-  while (n > 9) { n = String(n).split('').reduce((a,b) => a + Number(b), 0); }
-  return n;
-}
+function norm(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z]/g,' ');}
+function reduce(n){if(n===11||n===22||n===33)return n;while(n>9){n=String(n).split('').reduce((a,b)=>a+Number(b),0);}return n;}
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
+  res.setHeader('Access-Control-Allow-Origin','*');
+  res.setHeader('Access-Control-Allow-Methods','POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers','Content-Type');
+  if(req.method==='OPTIONS') return res.status(200).end();
+  if(req.method!=='POST') return res.status(405).json({error:'Método não permitido'});
 
   try {
-    const { photoBase64, name, birthDate } = req.body;
-    if (!photoBase64 || !name || !birthDate) {
-      return res.status(400).json({ error: 'Dados incompletos' });
-    }
+    const {photoBase64, name, birthDate} = req.body;
+    if(!photoBase64||!name||!birthDate) return res.status(400).json({error:'Dados incompletos'});
 
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    if (!GEMINI_API_KEY) {
-      return res.status(500).json({ error: 'Chave API não configurada' });
-    }
+    const KEY = process.env.GEMINI_API_KEY;
+    if(!KEY) return res.status(500).json({error:'Chave API não configurada'});
 
-    // Cálculo cabalístico real
-    const clean = normalize(name);
-    const letters = clean.split('').filter(c => c !== ' ');
-    const expressao = reduce(letters.reduce((a,c) => a + (CABAL[c] || 0), 0));
-    const alma = reduce(letters.filter(c => VOWELS.has(c)).reduce((a,c) => a + (CABAL[c] || 0), 0));
-    const personalidade = reduce(letters.filter(c => !VOWELS.has(c) && CABAL[c]).reduce((a,c) => a + (CABAL[c] || 0), 0));
+    const clean = norm(name);
+    const letters = clean.split('').filter(c=>c!==' ');
+    const expressao = reduce(letters.reduce((a,c)=>a+(CABAL[c]||0),0));
+    const alma = reduce(letters.filter(c=>VOWELS.has(c)).reduce((a,c)=>a+(CABAL[c]||0),0));
+    const personalidade = reduce(letters.filter(c=>!VOWELS.has(c)&&CABAL[c]).reduce((a,c)=>a+(CABAL[c]||0),0));
     const [y,m,d] = birthDate.split('-').map(Number);
-    const caminho_vida = reduce([...String(d),...String(m),...String(y)].map(Number).reduce((a,b) => a+b, 0));
+    const caminho = reduce([...String(d),...String(m),...String(y)].map(Number).reduce((a,b)=>a+b,0));
     const anoAtual = new Date().getFullYear();
-    const ano_pessoal = reduce([...String(d),...String(m),...String(anoAtual)].map(Number).reduce((a,b) => a+b, 0));
+    const anoP = reduce([...String(d),...String(m),...String(anoAtual)].map(Number).reduce((a,b)=>a+b,0));
 
-    const prompt = `Você é um mestre em numerologia cabalística e psicologia arquetípica profunda. Os números já foram calculados com precisão matemática:
+    const prompt = `Você é um psicólogo junguiano e mestre em numerologia cabalística. Os números foram calculados com precisão matemática — NÃO recalcule.
 
-Nome completo: ${name}
-Data de nascimento: ${birthDate}
-Número de Expressão/Destino: ${expressao}
-Número do Caminho de Vida: ${caminho_vida}
-Número da Alma/Motivação: ${alma}
-Número de Personalidade: ${personalidade}
-Ano Pessoal ${anoAtual}: ${ano_pessoal}
+DADOS:
+Nome: ${name}
+Nascimento: ${birthDate}
+Expressão/Destino: ${expressao}
+Caminho de Vida: ${caminho}
+Alma/Motivação: ${alma}
+Personalidade: ${personalidade}
+Ano Pessoal ${anoAtual}: ${anoP}
 
-Analise a foto para identificar as origens ancestrais pelos traços fenotípicos.
+Analise a foto para identificar origens ancestrais pelos traços fenotípicos.
 
-RESPONDA APENAS COM JSON VÁLIDO, sem markdown, sem texto antes ou depois:
+REGRAS ABSOLUTAS:
+- Responda APENAS com JSON válido, sem markdown, sem texto antes ou depois
+- Mínimo 150 palavras por campo de texto longo
+- Seja ESPECÍFICO para ${name} e para os números exatos — nada genérico
+- Porcentagens das regiões somam EXATAMENTE 100
+- Use segunda pessoa (você) nos textos
+- Tom: psicológico profundo, literário, revelador — não esotérico barato
+
+JSON a retornar:
 
 {
   "ancestralidade": {
     "regioes": [
-      {"regiao": "Nome da região", "porcentagem": 35},
-      {"regiao": "Nome da região", "porcentagem": 25},
-      {"regiao": "Nome da região", "porcentagem": 18},
-      {"regiao": "Nome da região", "porcentagem": 12},
-      {"regiao": "Nome da região", "porcentagem": 7},
-      {"regiao": "Nome da região", "porcentagem": 3}
+      {"regiao": "nome da região real", "porcentagem": 35},
+      {"regiao": "nome da região real", "porcentagem": 25},
+      {"regiao": "nome da região real", "porcentagem": 18},
+      {"regiao": "nome da região real", "porcentagem": 12},
+      {"regiao": "nome da região real", "porcentagem": 7},
+      {"regiao": "nome da região real", "porcentagem": 3}
     ],
-    "heranca_cultural": "Resumo em uma linha da herança dominante",
-    "narrativa": "ESCREVA 3 PARÁGRAFOS LONGOS separados por \\n\\n. Mínimo 120 palavras por parágrafo. Tom poético e revelador sobre a origem ancestral desta pessoa específica baseado nos traços faciais. Use a segunda pessoa. Cite civilizações reais, rios, montanhas, impérios históricos das regiões identificadas.",
-    "narrativa_completa": "ESCREVA 5 PARÁGRAFOS LONGOS separados por \\n\\n. Mínimo 150 palavras cada. Aprofunde cada região ancestral identificada, suas civilizações, contribuições históricas únicas, como esses traços se manifestam fisicamente e culturalmente nesta pessoa. Tom literário rico em detalhes históricos específicos."
+    "narrativa": "Três parágrafos longos (min 120 palavras cada) separados por \\n\\n. Sobre as origens ancestrais identificadas na foto — civilizações reais, rios, impérios, contribuições históricas. Tom poético e revelador. Cite as regiões identificadas.",
+    "narrativa_completa": "Cinco parágrafos longos (min 150 palavras cada) separados por \\n\\n. Aprofunde cada região — história específica, como esses traços se manifestam em ${name} hoje, legado cultural e genético. Tom literário rico."
   },
   "numerologia": {
     "expressao": ${expressao},
-    "expressao_nome": "arquétipo único e específico para o número ${expressao}",
-    "caminho_vida": ${caminho_vida},
-    "caminho_nome": "arquétipo para ${caminho_vida}",
+    "expressao_nome": "arquétipo específico do número ${expressao}",
+    "caminho_vida": ${caminho},
+    "caminho_nome": "arquétipo do número ${caminho}",
     "alma": ${alma},
-    "alma_nome": "arquétipo para ${alma}",
+    "alma_nome": "arquétipo do número ${alma}",
     "personalidade": ${personalidade},
-    "personalidade_nome": "arquétipo para ${personalidade}",
-    "ano_pessoal": ${ano_pessoal},
-    "ano_pessoal_tema": "tema específico do ano ${ano_pessoal} em poucas palavras",
-    "personalidade_analise": "ESCREVA 4 PARÁGRAFOS LONGOS separados por \\n\\n. Mínimo 150 palavras cada. Analise profundamente o número ${expressao} aplicado a esta pessoa específica chamada ${name}. Como esse número se manifesta no seu dia a dia, nas suas relações, nas suas escolhas. O que a move internamente. Como processa emoções. Seja ESPECÍFICO, não genérico. Mencione situações concretas da vida cotidiana.",
+    "personalidade_nome": "arquétipo do número ${personalidade}",
+    "ano_pessoal": ${anoP},
+    "ano_pessoal_tema": "tema de 4-6 palavras para ano ${anoP}",
+
+    "personalidade_analise": "Quatro parágrafos longos (min 150 palavras cada) separados por \\n\\n. Analise a psicologia profunda de ${name} com número de expressão ${expressao} e caminho ${caminho}. Como essa combinação molda a forma de pensar, sentir, tomar decisões, se relacionar. Cite ${name} pelo menos 3 vezes. Seja ESPECÍFICO para estes números, não escreva texto que poderia servir para qualquer pessoa.",
+
     "virtudes": [
-      {"nome": "Nome da virtude específica do número ${expressao}", "desc": "Descrição de 3-4 linhas de como essa virtude se manifesta concretamente no comportamento diário de uma pessoa com número ${expressao}. Dê exemplos situacionais."},
-      {"nome": "Segunda virtude", "desc": "Descrição específica com exemplos"},
-      {"nome": "Terceira virtude", "desc": "Descrição específica com exemplos"},
-      {"nome": "Quarta virtude", "desc": "Descrição específica com exemplos"}
+      {"nome": "nome da virtude específica do número ${expressao}", "desc": "Três linhas descrevendo como essa força se manifesta no comportamento real e cotidiano de ${name}. Com exemplos situacionais concretos."},
+      {"nome": "segunda virtude", "desc": "descrição com exemplos"},
+      {"nome": "terceira virtude", "desc": "descrição com exemplos"},
+      {"nome": "quarta virtude", "desc": "descrição com exemplos"}
     ],
+
     "defeitos": [
-      {"nome": "Nome do desafio específico do número ${expressao}", "desc": "Como esse desafio se manifesta em situações reais do dia a dia. Como se sente por dentro. E um caminho concreto de transformação — não vago, mas específico e aplicável."},
-      {"nome": "Segundo desafio", "desc": "Manifestação real e caminho de transformação"},
-      {"nome": "Terceiro desafio", "desc": "Manifestação real e caminho de transformação"},
-      {"nome": "Quarto desafio", "desc": "Manifestação real e caminho de transformação"}
+      {"nome": "nome do padrão sombrio do número ${expressao}", "desc": "Como esse padrão se manifesta em situações concretas do dia a dia de ${name}. O que dispara. Como se sente por dentro. Um caminho prático e específico de transformação."},
+      {"nome": "segundo padrão", "desc": "manifestação real e transformação"},
+      {"nome": "terceiro padrão", "desc": "manifestação real e transformação"},
+      {"nome": "quarto padrão", "desc": "manifestação real e transformação"}
     ],
-    "sombra_analise": "ESCREVA 3 PARÁGRAFOS separados por \\n\\n. Mínimo 100 palavras cada. A sombra psicológica do número ${expressao} — os padrões inconscientes, os medos que dirigem comportamentos, as crenças limitantes. Tom: honesto, compassivo, transformador. Cite Carl Jung se relevante.",
-    "missao_vida": "ESCREVA 3 PARÁGRAFOS LONGOS separados por \\n\\n. Mínimo 120 palavras cada. A missão de vida desta pessoa com expressão ${expressao} e caminho de vida ${caminho_vida}. Deve soar como uma revelação profunda e única. O que veio fazer neste plano. Como reconhece quando está no caminho certo. O legado que pode deixar.",
+
+    "pontos_cegos": [
+      {"nome": "ponto cego específico do número ${expressao}", "desc": "O que ${name} genuinamente não consegue ver em si mesmo. Como isso se manifesta nas relações e decisões. Por que é tão difícil de enxergar."},
+      {"nome": "segundo ponto cego", "desc": "descrição específica"},
+      {"nome": "terceiro ponto cego", "desc": "descrição específica"}
+    ],
+
+    "sombra_analise": "Três parágrafos longos (min 120 palavras cada) separados por \\n\\n. A sombra junguiana do número ${expressao} aplicada a ${name}. Padrões inconscientes, medos que dirigem comportamentos sem que ${name} perceba, crenças limitantes centrais. Mencione Jung se relevante. Tom honesto e compassivo.",
+
+    "missao_vida": "Três parágrafos longos (min 150 palavras cada) separados por \\n\\n. A missão de vida da combinação expressão ${expressao} + caminho ${caminho}. O que ${name} veio fazer nesta encarnação. Como reconhece quando está no caminho. O legado que pode deixar. Tom revelador, não vago.",
+
+    "persuasao": "Quatro parágrafos longos (min 130 palavras cada) separados por \\n\\n. Como ${name} é persuadido e manipulado — seus gatilhos emocionais reais, o que penetra suas defesas racionais, o que cria resistência absoluta, onde é mais vulnerável à manipulação. Como usar esse autoconhecimento para tomar decisões mais conscientes. ESPECÍFICO para os números ${expressao}/${caminho}/${alma}.",
+
+    "amor": "Três parágrafos longos (min 150 palavras cada) separados por \\n\\n. Como ${name} se comporta em relacionamentos amorosos — padrões inconscientes de atração, o que sabota, o que faz florescer. Compatibilidade específica com outros números. Não seja genérico.",
+
     "lideranca": {
       "habilidades": [
         {"nome": "Visão Estratégica", "valor": 82},
-        {"nome": "Influência Natural", "valor": 71},
-        {"nome": "Gestão de Conflitos", "valor": 58},
-        {"nome": "Comunicação", "valor": 76},
-        {"nome": "Tomada de Decisão", "valor": 85},
-        {"nome": "Inteligência Emocional", "valor": 69}
+        {"nome": "Influência Natural", "valor": 75},
+        {"nome": "Gestão de Conflitos", "valor": 60},
+        {"nome": "Comunicação", "valor": 78},
+        {"nome": "Análise de Situação", "valor": 88},
+        {"nome": "Inteligência Emocional", "valor": 71}
       ],
-      "analise": "ESCREVA 3 PARÁGRAFOS separados por \\n\\n. Mínimo 120 palavras cada. Estilo de liderança específico do número ${expressao}. Como lidera naturalmente, onde brilha, onde tropeça. Que tipo de equipe funciona melhor com esse perfil. Exemplos concretos de situações de liderança."
+      "analise": "Três parágrafos longos (min 120 palavras cada) separados por \\n\\n. Estilo de liderança específico de ${name} com número ${expressao}. Como lidera naturalmente, onde brilha, onde tropeça, que tipo de equipe funciona melhor."
     },
-    "persuasao": "ESCREVA 4 PARÁGRAFOS LONGOS separados por \\n\\n. Mínimo 120 palavras cada. Como a pessoa com números ${expressao}/${caminho_vida}/${alma} é persuadida. Que argumentos penetram suas defesas. Que gatilhos emocionais ativam. O que cria resistência absoluta. Como usar esse autoconhecimento para tomar decisões mais conscientes. SEJA ESPECÍFICO para estes números, não genérico.",
-    "amor": "ESCREVA 3 PARÁGRAFOS LONGOS separados por \\n\\n. Mínimo 130 palavras cada. Como esta pessoa com número ${expressao} e alma ${alma} se comporta em relacionamentos amorosos. Seus padrões inconscientes de atração. O que sabota seus relacionamentos. O que precisa para florescer num relacionamento. Compatibilidade específica com outros números.",
-    "vocacoes": "ESCREVA 3 PARÁGRAFOS LONGOS separados por \\n\\n. Mínimo 120 palavras cada. Vocações e talentos específicos dos números ${expressao}, ${caminho_vida} e ${alma} combinados. Carreiras específicas com exemplos. Ambientes de trabalho ideais e tóxicos. Como monetizar os talentos naturais.",
-    "ano_pessoal_analise": "ESCREVA 3 PARÁGRAFOS separados por \\n\\n. Mínimo 100 palavras cada. O que significa estar no Ano Pessoal ${ano_pessoal} em ${anoAtual}. Oportunidades concretas deste ciclo. Armadilhas a evitar. Ações práticas recomendadas para cada trimestre do ano."
-  }
-}
 
-REGRAS CRÍTICAS:
-- Use os números EXATOS fornecidos acima — NÃO recalcule
-- Porcentagens somam EXATAMENTE 100
-- NUNCA escreva texto genérico que poderia se aplicar a qualquer pessoa
-- SEMPRE mencione o nome ${name} pelo menos uma vez em cada seção longa
-- Mínimo total de 3000 palavras no JSON completo
-- JSON deve ser válido — sem vírgulas extras, sem caracteres especiais quebrados`;
+    "ano_pessoal_analise": "Três parágrafos (min 110 palavras cada) separados por \\n\\n. O que significa o Ano Pessoal ${anoP} em ${anoAtual} para ${name} especificamente. Oportunidades concretas, armadilhas a evitar, orientações práticas por período do ano."
+  }
+}`;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${KEY}`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           contents: [{
             parts: [
-              { inline_data: { mime_type: 'image/jpeg', data: photoBase64 } },
-              { text: prompt }
+              {inline_data: {mime_type: 'image/jpeg', data: photoBase64}},
+              {text: prompt}
             ]
           }],
-          generationConfig: {
-            temperature: 0.9,
-            maxOutputTokens: 8192
-          }
+          generationConfig: {temperature: 0.85, maxOutputTokens: 8192}
         })
       }
     );
 
     if (!response.ok) {
-      const errText = await response.text();
-      console.error('Gemini error:', errText);
-      return res.status(500).json({ error: 'Erro na API Gemini', details: errText });
+      const err = await response.text();
+      console.error('Gemini error:', err);
+      return res.status(500).json({error: 'Erro Gemini', details: err});
     }
 
     const data = await response.json();
-
-    if (!data.candidates || !data.candidates[0]) {
-      console.error('Sem candidatos:', JSON.stringify(data));
-      return res.status(500).json({ error: 'Resposta vazia do Gemini', raw: data });
+    if (!data.candidates?.[0]) {
+      return res.status(500).json({error: 'Sem resposta', raw: data});
     }
 
     const text = data.candidates[0].content.parts[0].text;
-    const clean2 = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const cleaned = text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
 
     let result;
     try {
-      result = JSON.parse(clean2);
-    } catch(parseErr) {
-      console.error('JSON parse error:', parseErr.message);
-      console.error('Raw text:', clean2.substring(0, 500));
-      return res.status(500).json({ error: 'JSON inválido do Gemini', raw: clean2.substring(0, 500) });
+      result = JSON.parse(cleaned);
+    } catch(e) {
+      console.error('Parse error:', e.message, cleaned.substring(0,300));
+      return res.status(500).json({error: 'JSON inválido', raw: cleaned.substring(0,300)});
     }
 
     return res.status(200).json(result);
 
-  } catch (err) {
+  } catch(err) {
     console.error('Handler error:', err);
-    return res.status(500).json({ error: 'Erro interno', details: err.message });
+    return res.status(500).json({error: 'Erro interno', details: err.message});
   }
 };
