@@ -32,7 +32,7 @@
 html { scroll-behavior:smooth; }
 
 body {
-  background: var(--bg);
+  background: #050508;
   color: var(--text);
   font-family: 'Cormorant Garamond', serif;
   font-size: 18px;
@@ -47,12 +47,17 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(201,168,76,0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 40% at 90% 80%, rgba(61,43,107,0.06) 0%, transparent 50%),
-    radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.4) 0%, transparent 100%),
-    radial-gradient(1px 1px at 75% 15%, rgba(255,255,255,0.3) 0%, transparent 100%),
-    radial-gradient(1px 1px at 55% 70%, rgba(255,255,255,0.25) 0%, transparent 100%),
-    radial-gradient(2px 2px at 85% 45%, rgba(201,168,76,0.35) 0%, transparent 100%);
+    radial-gradient(ellipse 120% 70% at 50% -10%, rgba(120,80,20,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 85% 85%, rgba(61,43,107,0.14) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at 10% 60%, rgba(80,40,10,0.1) 0%, transparent 50%),
+    radial-gradient(1px 1px at 20% 30%, rgba(255,240,180,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 15%, rgba(255,240,180,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 70%, rgba(255,240,180,0.4) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 85% 45%, rgba(201,168,76,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 35% 85%, rgba(255,240,180,0.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 40%, rgba(255,240,180,0.45) 0%, transparent 100%),
+    radial-gradient(1px 1px at 92% 20%, rgba(201,168,76,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 8% 90%, rgba(255,240,180,0.3) 0%, transparent 100%);
   pointer-events: none;
   z-index: 0;
 }
@@ -135,44 +140,57 @@ body::before {
   align-items:center; justify-content:center;
   padding:60px 28px; text-align:center;
   min-height:100vh;
+  position:relative;
 }
+#s-intro::after {
+  content:'';
+  position:absolute; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 80% at 50% 50%, rgba(61,43,107,0.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+#s-intro > * { position:relative; z-index:1; }
 
 .sigil-wrap {
-  width:120px; height:120px;
+  width:130px; height:130px;
   margin:0 auto 44px;
   animation:breathe 6s ease-in-out infinite;
 }
 
 .brand {
   font-family:'Cinzel',serif;
-  font-size:34px; font-weight:600;
-  letter-spacing:10px; color:var(--gold);
+  font-size:36px; font-weight:600;
+  letter-spacing:10px; color:#F0D878;
   margin-bottom:6px;
+  text-shadow: 0 0 40px rgba(201,168,76,0.5), 0 2px 4px rgba(0,0,0,0.8);
 }
 .brand-sub {
   font-family:'Inter',sans-serif;
-  font-size:10px; letter-spacing:6px;
-  color:var(--text-dim); text-transform:uppercase;
+  font-size:11px; letter-spacing:6px;
+  color:#A89060; text-transform:uppercase;
   margin-bottom:56px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
 }
 
 .intro-line {
   width:1px; height:60px;
-  background:linear-gradient(180deg,transparent,var(--gold-dim),transparent);
+  background:linear-gradient(180deg,transparent,var(--gold),transparent);
   margin:0 auto 48px;
 }
 
 .intro-text {
-  font-size:20px; font-style:italic; font-weight:300;
-  color:var(--text-mid); line-height:1.95;
+  font-size:21px; font-style:italic; font-weight:400;
+  color:#D4C4A0; line-height:1.95;
   max-width:320px; margin-bottom:56px;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.7);
 }
-.intro-text em { color:var(--gold-light); font-style:normal; font-weight:400; }
+.intro-text em { color:#F0D878; font-style:normal; font-weight:600; }
 
 .trust-row {
-  margin-top:20px;
+  margin-top:18px;
   font-family:'Inter',sans-serif;
-  font-size:11px; color:var(--text-dim);
+  font-size:12px; color:#7A6840;
   letter-spacing:2px;
 }
 
@@ -419,7 +437,7 @@ body::before {
     "Seu nome guarda números que revelam sua <em>psicologia profunda</em>. Seus traços guardam a memória de <em>civilizações inteiras</em>."
   </p>
 
-  <button class="btn-primary" onclick="go('s-form')">REVELAR MEU MAPA</button>
+  <button class="btn-primary" id="btnIntro">REVELAR MEU MAPA</button>
   <p class="trust-row" style="margin-top:18px">✦ Numerologia cabalística real · Análise ancestral por IA</p>
 </div>
 
@@ -453,7 +471,7 @@ body::before {
     <input class="field-input" type="date" id="iDate">
   </div>
 
-  <button class="btn-primary" style="margin:0 auto" onclick="startAnalysis()">CALCULAR MEU MAPA</button>
+  <button class="btn-primary" id="btnForm" style="margin:0 auto">CALCULAR MEU MAPA</button>
   <p class="trust-row" style="text-align:center;margin-top:14px">🔒 Privado e seguro</p>
 </div>
 
@@ -933,6 +951,45 @@ function fallback(name, date) {
     }
   };
 }
+
+// ── Init: bind all buttons with addEventListener (more reliable than onclick) ──
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('btnIntro').addEventListener('click', () => go('s-form'));
+  document.getElementById('btnForm').addEventListener('click', startAnalysis);
+  document.querySelector('.btn-pay').addEventListener('click', handlePayment);
+
+  // Stars canvas
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.6';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  const stars = [];
+  function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+  for (let i = 0; i < 120; i++) {
+    stars.push({
+      x: Math.random(), y: Math.random(),
+      r: Math.random() * 1.2 + 0.2,
+      o: Math.random() * 0.6 + 0.1,
+      speed: Math.random() * 0.003 + 0.001,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+  let frame = 0;
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      const opacity = s.o * (0.6 + 0.4 * Math.sin(frame * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x * canvas.width, s.y * canvas.height, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,240,180,${opacity})`;
+      ctx.fill();
+    });
+    frame++;
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+});
 </script>
 </body>
 </html>
