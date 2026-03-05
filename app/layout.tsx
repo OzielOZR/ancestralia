@@ -52,7 +52,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`${cormorantGaramond.variable} ${lato.variable} antialiased`}
+        className={`${cormorantGaramond.variable} ${lato.variable} font-body antialiased`}
       >
         {children}
       </body>

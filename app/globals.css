@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@theme {
+@theme inline {
   --color-background: #0a0812;
   --color-foreground: #f0e6c8;
   --color-primary: #c9a84c;
@@ -24,8 +24,8 @@
   --radius: 0.5rem;
 
   --font-sans: var(--font-cormorant), 'Georgia', serif;
-  --font-mono: var(--font-space-mono), monospace;
-  --font-body: var(--font-lato), 'Helvetica Neue', sans-serif;
+  --font-mono: 'Courier New', monospace;
+  --font-serif: var(--font-cormorant), 'Georgia', serif;
 }
 
 * {
@@ -40,7 +40,7 @@ html {
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
-  font-family: var(--font-body);
+  font-family: var(--font-lato), 'Helvetica Neue', sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
@@ -122,7 +122,7 @@ body {
 
 .prose-mystical h2 {
   color: var(--color-primary);
-  font-family: var(--font-sans);
+  font-family: var(--font-cormorant), Georgia, serif;
   font-size: 1.5rem;
   font-weight: 700;
   margin-top: 2rem;
@@ -131,7 +131,7 @@ body {
 
 .prose-mystical h3 {
   color: var(--color-accent);
-  font-family: var(--font-sans);
+  font-family: var(--font-cormorant), Georgia, serif;
   font-size: 1.2rem;
   font-weight: 600;
   margin-top: 1.5rem;
@@ -147,3 +147,8 @@ body {
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--color-background); }
 ::-webkit-scrollbar-thumb { background: var(--color-primary); border-radius: 3px; }
+
+/* Custom font utility — maps to Lato (body/UI font) */
+.font-body {
+  font-family: var(--font-lato), 'Helvetica Neue', sans-serif;
+}
