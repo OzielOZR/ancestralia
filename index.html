@@ -748,8 +748,30 @@ function renderAncestry() {
 }
 
 // ── Render Numerology ──
+// Converte markdown bold (**texto**) para HTML
+function mdToHtml(text) {
+  if (!text) return '';
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--gold-light);font-family:\'Cinzel\',serif;font-size:14px;letter-spacing:1px">$1</strong>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+}
+
+// Extrai seção do texto completo por título
+function extractSection(text, title) {
+  const regex = new RegExp(`\\*\\*${title}[^*]*\\*\\*([\\s\\S]*?)(?=\\*\\*[0-9]+\\.|\*\\*[A-Z]|$)`, 'i');
+  const match = text.match(regex);
+  return match ? match[1].trim() : '';
+}
+
+// Pega primeiros N parágrafos de um texto
+function firstParas(text, n) {
+  return text.split(/\n\n+/).slice(0,n).join('\n\n');
+}
+
 function renderNumerology() {
   const data = S.result; const num = data.numerologia;
+  const texto = num.texto_completo || '';
   const d = new Date(S.date+'T00:00:00');
   const ds = d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
   document.getElementById('numAvatar').src = S.photo;
@@ -759,38 +781,32 @@ function renderNumerology() {
   document.getElementById('calcBox').innerHTML = buildCalcBox(S.name);
 
   document.getElementById('numTable').innerHTML = `
-    <tr><td>Expressão / Destino</td><td><span class="num-big">${num.expressao}</span>${num.expressao_nome}</td></tr>
-    <tr><td>Caminho de Vida</td><td><span class="num-big">${num.caminho_vida}</span>${num.caminho_nome}</td></tr>
-    <tr><td>Alma / Motivação</td><td><span class="num-big">${num.alma}</span>${num.alma_nome}</td></tr>
-    <tr><td>Personalidade</td><td><span class="num-big">${num.personalidade}</span>${num.personalidade_nome}</td></tr>
-    <tr><td>Ano Pessoal ${new Date().getFullYear()}</td><td><span class="num-big">${num.ano_pessoal}</span>${num.ano_pessoal_tema}</td></tr>
+    <tr><td>Expressão / Destino</td><td><span class="num-big">${num.expressao}</span></td></tr>
+    <tr><td>Caminho de Vida</td><td><span class="num-big">${num.caminho_vida}</span></td></tr>
+    <tr><td>Alma / Motivação</td><td><span class="num-big">${num.alma}</span></td></tr>
+    <tr><td>Personalidade</td><td><span class="num-big">${num.personalidade}</span></td></tr>
+    <tr><td>Dia de Nascimento</td><td><span class="num-big">${num.dia_nascimento}</span></td></tr>
+    <tr><td>Ano Pessoal ${new Date().getFullYear()}</td><td><span class="num-big">${num.ano_pessoal}</span></td></tr>
   `;
 
-  document.getElementById('numLayerTitle').textContent = `${S.name.split(' ')[0]} — Número ${num.expressao}`;
-  document.getElementById('numLayerText').innerHTML = num.personalidade_analise.split('\n\n').map(p=>`<p>${p}</p>`).join('');
+  document.getElementById('numLayerTitle').textContent = `${S.name.split(' ')[0]} — Revelação Inicial`;
 
-  // Virtudes
-  let vHtml = '';
-  num.virtudes.forEach(v => {
-    vHtml += `<div class="layer-card virtue"><div class="layer-tag">Força</div><div class="layer-name">${v.nome}</div><div class="layer-desc">${v.desc}</div></div>`;
-  });
-  document.getElementById('virtueCards').innerHTML = vHtml;
+  // Mostra intro + início do mapa pitagórico (grátis)
+  const introMatch = texto.match(/Saudação[\s\S]*?(?=\*\*2\.|$)/i) || texto.match(/Querido[\s\S]{0,2000}/i);
+  const introText = introMatch ? introMatch[0] : firstParas(texto, 4);
+  document.getElementById('numLayerText').innerHTML = `<p>${mdToHtml(introText)}</p>`;
 
-  // Blur: defeitos
-  let fHtml = '';
-  num.defeitos.forEach(f => {
-    fHtml += `<div class="layer-card flaw" style="margin-bottom:10px"><div class="layer-tag">Sombra</div><div class="layer-name">${f.nome}</div><div class="layer-desc">${f.desc}</div></div>`;
-  });
-  num.pontos_cegos.forEach(p => {
-    fHtml += `<div class="layer-card blind" style="margin-bottom:10px"><div class="layer-tag">Ponto Cego</div><div class="layer-name">${p.nome}</div><div class="layer-desc">${p.desc}</div></div>`;
-  });
-  document.getElementById('flawBlur').innerHTML = fHtml;
+  // Cards de virtudes (grátis) - extraídos do mapa pitagórico
+  const pitagorico = extractSection(texto, '2');
+  const virtCards = pitagorico || firstParas(texto.split('\n\n').slice(3,8).join('\n\n'), 3);
+  document.getElementById('virtueCards').innerHTML = `<div class="layer-card virtue"><div class="layer-tag">Mapa Pitagórico</div><div class="layer-desc long-text" style="font-size:15px"><p>${mdToHtml(firstParas(virtCards||texto, 5))}</p></div></div>`;
 
-  // Blur: persuasão
-  document.getElementById('persuasionBlur').innerHTML = `<div class="long-text">${num.persuasao.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`;
+  // Blur: resto do relatório (bloqueado)
+  const restText = texto.split('\n\n').slice(8).join('\n\n');
+  document.getElementById('flawBlur').innerHTML = `<div class="long-text"><p>${mdToHtml(firstParas(restText, 4))}</p></div>`;
+  document.getElementById('persuasionBlur').innerHTML = `<div class="long-text"><p>${mdToHtml(firstParas(texto.split('\n\n').slice(15,22).join('\n\n'), 4))}</p></div>`;
 
-  // Paywall sub
-  document.getElementById('pwSub').textContent = `${S.name.split(' ')[0]}, você viu apenas o começo. O mapa completo revela seus padrões ocultos, pontos cegos, vulnerabilidades e seu propósito real.`;
+  document.getElementById('pwSub').textContent = `${S.name.split(' ')[0]}, você viu apenas o começo. O relatório completo com 1800+ palavras revela seus padrões ocultos, lições cármicas, áreas de persuasão e propósito de vida.`;
 }
 
 // ── Payment ──
@@ -804,74 +820,47 @@ function handlePayment() {
 // ── Full Report ──
 function renderFull() {
   const data = S.result; const anc = data.ancestralidade; const num = data.numerologia;
+  const texto = num.texto_completo || '';
   const cont = document.getElementById('fullContent');
   cont.innerHTML = '';
 
-  const sections = [
-    {
-      label: 'Origem Ancestral',
-      title: 'Mapa Ancestral Completo',
-      html: `
-        ${anc.regioes.map((r,i)=>`<div class="anc-item"><div class="anc-row"><span class="anc-name">${r.regiao}</span><span class="anc-pct">${r.porcentagem}%</span></div><div class="anc-track"><div class="anc-fill" style="width:${r.porcentagem}%;animation-delay:${i*.1}s"></div></div></div>`).join('')}
-        <div class="divider"><span>·</span></div>
-        <div class="long-text">${anc.narrativa_completa.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
-    },
-    {
-      label: 'Camada I · Psicologia',
-      title: 'Quem Você É Por Dentro',
-      html: `
-        <div class="long-text">${num.personalidade_analise.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>
-        <div class="divider"><span>·</span></div>
-        <p class="eyebrow" style="color:var(--green-light);margin-bottom:12px">Forças Internas</p>
-        ${num.virtudes.map(v=>`<div class="layer-card virtue" style="margin-bottom:10px"><div class="layer-tag">Força</div><div class="layer-name">${v.nome}</div><div class="layer-desc">${v.desc}</div></div>`).join('')}`
-    },
-    {
-      label: 'Camada II · Sombras',
-      title: 'Seus Padrões Ocultos e Pontos Cegos',
-      html: `
-        <p class="eyebrow" style="color:var(--red-light);margin-bottom:12px">Sombras</p>
-        ${num.defeitos.map(f=>`<div class="layer-card flaw" style="margin-bottom:10px"><div class="layer-tag">Sombra</div><div class="layer-name">${f.nome}</div><div class="layer-desc">${f.desc}</div></div>`).join('')}
-        <p class="eyebrow" style="color:var(--purple-light);margin:20px 0 12px">Pontos Cegos</p>
-        ${num.pontos_cegos.map(p=>`<div class="layer-card blind" style="margin-bottom:10px"><div class="layer-tag">Ponto Cego</div><div class="layer-name">${p.nome}</div><div class="layer-desc">${p.desc}</div></div>`).join('')}
-        <div class="divider"><span>·</span></div>
-        <div class="long-text">${num.sombra_analise.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
-    },
-    {
-      label: 'Camada III · Persuasão',
-      title: 'Onde Você é Persuadido e Manipulado',
-      html: `<div class="long-text">${num.persuasao.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
-    },
-    {
-      label: 'Camada IV · Propósito',
-      title: 'Suas Metas e Propósito de Vida',
-      html: `<div class="long-text">${num.missao_vida.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
-    },
-    {
-      label: 'Camada V · Amor',
-      title: 'Relacionamentos e Padrões Afetivos',
-      html: `<div class="long-text">${num.amor.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
-    },
-    {
-      label: 'Camada VI · Liderança',
-      title: 'Seu Potencial de Liderança',
-      html: `
-        <div style="margin-bottom:20px">${num.lideranca.habilidades.map(h=>`<div class="radar-item"><span class="radar-label">${h.nome}</span><div class="radar-track"><div class="radar-fill" style="width:${h.valor}%"></div></div><span class="radar-num">${h.valor}</span></div>`).join('')}</div>
-        <div class="long-text">${num.lideranca.analise.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
-    },
-    {
-      label: `Ano Pessoal ${new Date().getFullYear()}`,
-      title: 'Previsão e Orientações do Ciclo Atual',
-      html: `<div class="long-text">${num.ano_pessoal_analise.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>`
-    }
-  ];
+  // Ancestralidade
+  const ancDiv = document.createElement('div');
+  ancDiv.className = 'report-section'; ancDiv.style.animationDelay = '0s';
+  ancDiv.innerHTML = `
+    <p class="rs-eyebrow">Origem Ancestral</p>
+    <h3 class="rs-title">Mapa Ancestral Completo</h3>
+    ${anc.regioes.map((r,i)=>`<div class="anc-item"><div class="anc-row"><span class="anc-name">${r.regiao}</span><span class="anc-pct">${r.porcentagem}%</span></div><div class="anc-track"><div class="anc-fill" style="width:${r.porcentagem}%;animation-delay:${i*.1}s"></div></div></div>`).join('')}
+    <div class="divider"><span>·</span></div>
+    <div class="long-text"><p>${mdToHtml(anc.narrativa_completa)}</p></div>`;
+  cont.appendChild(ancDiv);
 
-  sections.forEach((sec,i) => {
+  // Relatório numerológico completo em blocos
+  const secoes = texto.split(/(?=\*\*[0-9]+\.)/);
+  secoes.forEach((sec, i) => {
+    if (!sec.trim()) return;
+    const titleMatch = sec.match(/\*\*([^*]+)\*\*/);
+    const title = titleMatch ? titleMatch[1].replace(/^\d+\.\s*/,'') : `Seção ${i+1}`;
+    const body = sec.replace(/\*\*[^*]+\*\*/, '').trim();
+    if (!body) return;
+
     const div = document.createElement('div');
     div.className = 'report-section';
-    div.style.animationDelay = (i*.1)+'s';
-    div.innerHTML = `<p class="rs-eyebrow">${sec.label}</p><h3 class="rs-title">${sec.title}</h3>${sec.html}`;
+    div.style.animationDelay = (i * 0.08) + 's';
+    div.innerHTML = `
+      <p class="rs-eyebrow">Numerologia Profunda</p>
+      <h3 class="rs-title">${title}</h3>
+      <div class="long-text"><p>${mdToHtml(body)}</p></div>`;
     cont.appendChild(div);
   });
+
+  // Se não conseguiu parsear seções, mostra texto inteiro
+  if (secoes.length <= 1) {
+    const div = document.createElement('div');
+    div.className = 'report-section'; div.style.animationDelay = '0.1s';
+    div.innerHTML = `<p class="rs-eyebrow">Relatório Completo</p><h3 class="rs-title">Mapa Numerológico</h3><div class="long-text"><p>${mdToHtml(texto)}</p></div>`;
+    cont.appendChild(div);
+  }
 
   const share = document.createElement('div');
   share.style.cssText = 'text-align:center;padding:8px 0 20px;width:100%;max-width:440px';

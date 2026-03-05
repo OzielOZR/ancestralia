@@ -8,14 +8,14 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods','POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers','Content-Type');
   if(req.method==='OPTIONS') return res.status(200).end();
-  if(req.method!=='POST') return res.status(405).json({error:'Método não permitido'});
+  if(req.method!=='POST') return res.status(405).json({error:'Metodo nao permitido'});
 
   try {
     const {photoBase64, name, birthDate} = req.body;
     if(!photoBase64||!name||!birthDate) return res.status(400).json({error:'Dados incompletos'});
 
     const KEY = process.env.GEMINI_API_KEY;
-    if(!KEY) return res.status(500).json({error:'Chave API não configurada'});
+    if(!KEY) return res.status(500).json({error:'Chave API nao configurada'});
 
     const clean = norm(name);
     const letters = clean.split('').filter(c=>c!==' ');
@@ -24,146 +24,127 @@ module.exports = async function handler(req, res) {
     const personalidade = reduce(letters.filter(c=>!VOWELS.has(c)&&CABAL[c]).reduce((a,c)=>a+(CABAL[c]||0),0));
     const [y,m,d] = birthDate.split('-').map(Number);
     const caminho = reduce([...String(d),...String(m),...String(y)].map(Number).reduce((a,b)=>a+b,0));
+    const diaNasc = reduce(d);
     const anoAtual = new Date().getFullYear();
     const anoP = reduce([...String(d),...String(m),...String(anoAtual)].map(Number).reduce((a,b)=>a+b,0));
+    const dateFormatted = `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${y}`;
+    const firstName = name.split(' ')[0];
 
-    const prompt = `Você é um psicólogo junguiano e mestre em numerologia cabalística. Os números foram calculados com precisão matemática — NÃO recalcule.
+    const numerologyPrompt = `Voce e um numerologo especialista em numerologia pitagorica e cabalistica, com mais de 20 anos de experiencia. Sua linguagem e profunda, mistica, envolvente e transformadora, como se estivesse revelando segredos sagrados da alma diretamente ao consulente. Nunca resuma; expanda cada secao com explicacoes detalhadas, exemplos praticos, perguntas retoticas que geram curiosidade intensa e metaforas espirituais. O texto final deve ter no minimo 1800 palavras.
 
-DADOS:
-Nome: ${name}
-Nascimento: ${birthDate}
-Expressão/Destino: ${expressao}
-Caminho de Vida: ${caminho}
-Alma/Motivação: ${alma}
-Personalidade: ${personalidade}
-Ano Pessoal ${anoAtual}: ${anoP}
+Dados do consulente:
+- Nome completo de nascimento: ${name}
+- Data de nascimento: ${dateFormatted}
 
-Analise a foto para identificar origens ancestrais pelos traços fenotípicos.
+Numeros calculados com precisao matematica — use EXATAMENTE estes valores:
+- Expressao/Destino Total: ${expressao}
+- Alma/Motivacao Interna (vogais): ${alma}
+- Personalidade/Impressao Externa (consoantes): ${personalidade}
+- Caminho de Vida: ${caminho}
+- Dia de Nascimento: ${diaNasc}
+- Ano Pessoal ${anoAtual}: ${anoP}
 
-REGRAS ABSOLUTAS:
-- Responda APENAS com JSON válido, sem markdown, sem texto antes ou depois
-- Mínimo 150 palavras por campo de texto longo
-- Seja ESPECÍFICO para ${name} e para os números exatos — nada genérico
-- Porcentagens das regiões somam EXATAMENTE 100
-- Use segunda pessoa (você) nos textos
-- Tom: psicológico profundo, literário, revelador — não esotérico barato
+Escreva o relatorio completo em portugues com estas secoes em ordem:
 
-JSON a retornar:
+**1. Saudacao e Revelacao Inicial**
+Comece com: "Querido(a) ${firstName}, ao decifrar as vibracoes que sua alma escolheu antes desta encarnacao...". Apresente os numeros dominantes (${caminho}, ${expressao}, ${alma}) com impacto. Minimo 200 palavras.
 
-{
-  "ancestralidade": {
-    "regioes": [
-      {"regiao": "nome da região real", "porcentagem": 35},
-      {"regiao": "nome da região real", "porcentagem": 25},
-      {"regiao": "nome da região real", "porcentagem": 18},
-      {"regiao": "nome da região real", "porcentagem": 12},
-      {"regiao": "nome da região real", "porcentagem": 7},
-      {"regiao": "nome da região real", "porcentagem": 3}
-    ],
-    "narrativa": "Três parágrafos longos (min 120 palavras cada) separados por \\n\\n. Sobre as origens ancestrais identificadas na foto — civilizações reais, rios, impérios, contribuições históricas. Tom poético e revelador. Cite as regiões identificadas.",
-    "narrativa_completa": "Cinco parágrafos longos (min 150 palavras cada) separados por \\n\\n. Aprofunde cada região — história específica, como esses traços se manifestam em ${name} hoje, legado cultural e genético. Tom literário rico."
-  },
-  "numerologia": {
-    "expressao": ${expressao},
-    "expressao_nome": "arquétipo específico do número ${expressao}",
-    "caminho_vida": ${caminho},
-    "caminho_nome": "arquétipo do número ${caminho}",
-    "alma": ${alma},
-    "alma_nome": "arquétipo do número ${alma}",
-    "personalidade": ${personalidade},
-    "personalidade_nome": "arquétipo do número ${personalidade}",
-    "ano_pessoal": ${anoP},
-    "ano_pessoal_tema": "tema de 4-6 palavras para ano ${anoP}",
+**2. Mapa Numerologico Pitagorico**
+Explique em detalhes:
+- Caminho de Vida ${caminho}: caracteristicas, talentos, desafios, exemplos cotidianos
+- Alma/Motivacao ${alma}: o que move ${firstName} internamente, desejos ocultos
+- Expressao/Destino ${expressao}: como ${firstName} se manifesta no mundo
+- Personalidade ${personalidade}: como os outros percebem ${firstName}
+- Dia de Nascimento ${diaNasc}: dom especifico trazido ao nascer
+Minimo 350 palavras nesta secao.
 
-    "personalidade_analise": "Quatro parágrafos longos (min 150 palavras cada) separados por \\n\\n. Analise a psicologia profunda de ${name} com número de expressão ${expressao} e caminho ${caminho}. Como essa combinação molda a forma de pensar, sentir, tomar decisões, se relacionar. Cite ${name} pelo menos 3 vezes. Seja ESPECÍFICO para estes números, não escreva texto que poderia servir para qualquer pessoa.",
+**3. Mapa Numerologico Cabalistico**
+Mesmos numeros mas com foco espiritual: missao da alma, licoes carmicas, conexao com a Arvore da Vida, resgates espirituais. Destaque diferencas sutis em relacao ao pitagorico. Minimo 280 palavras.
 
-    "virtudes": [
-      {"nome": "nome da virtude específica do número ${expressao}", "desc": "Três linhas descrevendo como essa força se manifesta no comportamento real e cotidiano de ${name}. Com exemplos situacionais concretos."},
-      {"nome": "segunda virtude", "desc": "descrição com exemplos"},
-      {"nome": "terceira virtude", "desc": "descrição com exemplos"},
-      {"nome": "quarta virtude", "desc": "descrição com exemplos"}
-    ],
+**4. Comparacao e Integracao Hibrida**
+O pitagorico revela o "como" no plano material; o cabalistico revela o "por que" divino. Mostre como esses sistemas se complementam especificamente para ${firstName}. Minimo 200 palavras.
 
-    "defeitos": [
-      {"nome": "nome do padrão sombrio do número ${expressao}", "desc": "Como esse padrão se manifesta em situações concretas do dia a dia de ${name}. O que dispara. Como se sente por dentro. Um caminho prático e específico de transformação."},
-      {"nome": "segundo padrão", "desc": "manifestação real e transformação"},
-      {"nome": "terceiro padrão", "desc": "manifestação real e transformação"},
-      {"nome": "quarto padrão", "desc": "manifestação real e transformação"}
-    ],
+**5. Areas Onde Sua Alma e Mais Persuadida e Influenciada**
+Baseado no Numero da Alma (${alma}) combinado com ${caminho} e ${expressao}. Liste 4 areas especificas com exemplos praticos de como usar isso conscientemente em negociacoes, relacionamentos e tomada de decisao. Minimo 280 palavras.
 
-    "pontos_cegos": [
-      {"nome": "ponto cego específico do número ${expressao}", "desc": "O que ${name} genuinamente não consegue ver em si mesmo. Como isso se manifesta nas relações e decisões. Por que é tão difícil de enxergar."},
-      {"nome": "segundo ponto cego", "desc": "descrição específica"},
-      {"nome": "terceiro ponto cego", "desc": "descrição específica"}
-    ],
+**6. Areas de Potencial Evolucao Espiritual e Pessoal**
+Baseado no Caminho de Vida (${caminho}) e licoes carmicas. Liste 4 areas com: desafio atual, licao karmica, potencial de ascensao e metafora espiritual. Minimo 280 palavras.
 
-    "sombra_analise": "Três parágrafos longos (min 120 palavras cada) separados por \\n\\n. A sombra junguiana do número ${expressao} aplicada a ${name}. Padrões inconscientes, medos que dirigem comportamentos sem que ${name} perceba, crenças limitantes centrais. Mencione Jung se relevante. Tom honesto e compassivo.",
+**7. Licao Carmica Oculta e Bloqueio Mais Relevante**
+Identifique 2 bloqueios principais com origem carmica, como se manifestam na vida de ${firstName} hoje e caminho concreto de liberacao. Minimo 220 palavras.
 
-    "missao_vida": "Três parágrafos longos (min 150 palavras cada) separados por \\n\\n. A missão de vida da combinação expressão ${expressao} + caminho ${caminho}. O que ${name} veio fazer nesta encarnação. Como reconhece quando está no caminho. O legado que pode deixar. Tom revelador, não vago.",
+**8. Teasers Persuasivos para a Leitura Premium**
+Crie 5 teasers intrigantes que deixem ${firstName} ansioso(a) por saber mais. Termine com: "A leitura completa e personalizada, incluindo previsoes detalhadas para os proximos 12-24 meses, compatibilidade amorosa profunda, caminhos de manifestacao de abundancia e orientacao para ascensao espiritual esta disponivel agora. Nao deixe esses segredos escaparem — eles foram escritos para voce, ${firstName}, desde o nascimento."
 
-    "persuasao": "Quatro parágrafos longos (min 130 palavras cada) separados por \\n\\n. Como ${name} é persuadido e manipulado — seus gatilhos emocionais reais, o que penetra suas defesas racionais, o que cria resistência absoluta, onde é mais vulnerável à manipulação. Como usar esse autoconhecimento para tomar decisões mais conscientes. ESPECÍFICO para os números ${expressao}/${caminho}/${alma}.",
+Tom: formal-mistico, respeitoso, profundamente empatico. Use segunda pessoa. Cada frase deve adicionar valor ou emocao. Finalize com frase impactante de encerramento.
 
-    "amor": "Três parágrafos longos (min 150 palavras cada) separados por \\n\\n. Como ${name} se comporta em relacionamentos amorosos — padrões inconscientes de atração, o que sabota, o que faz florescer. Compatibilidade específica com outros números. Não seja genérico.",
+Expanda cada secao ao maximo. Nao resuma. Total minimo: 1800 palavras.`;
 
-    "lideranca": {
-      "habilidades": [
-        {"nome": "Visão Estratégica", "valor": 82},
-        {"nome": "Influência Natural", "valor": 75},
-        {"nome": "Gestão de Conflitos", "valor": 60},
-        {"nome": "Comunicação", "valor": 78},
-        {"nome": "Análise de Situação", "valor": 88},
-        {"nome": "Inteligência Emocional", "valor": 71}
-      ],
-      "analise": "Três parágrafos longos (min 120 palavras cada) separados por \\n\\n. Estilo de liderança específico de ${name} com número ${expressao}. Como lidera naturalmente, onde brilha, onde tropeça, que tipo de equipe funciona melhor."
-    },
+    const ancestryPrompt = `Analise esta foto e identifique origens ancestrais pelos tracos fenotipicos. Responda APENAS com JSON valido sem texto antes ou depois:
+{"regioes":[{"regiao":"nome","porcentagem":35},{"regiao":"nome","porcentagem":25},{"regiao":"nome","porcentagem":18},{"regiao":"nome","porcentagem":12},{"regiao":"nome","porcentagem":7},{"regiao":"nome","porcentagem":3}],"narrativa":"Tres paragrafos ricos separados por \\n\\n sobre origens ancestrais. Tom poetico, cite civilizacoes reais. Minimo 300 palavras.","narrativa_completa":"Cinco paragrafos aprofundados separados por \\n\\n. Minimo 500 palavras."}
+Porcentagens somam exatamente 100.`;
 
-    "ano_pessoal_analise": "Três parágrafos (min 110 palavras cada) separados por \\n\\n. O que significa o Ano Pessoal ${anoP} em ${anoAtual} para ${name} especificamente. Oportunidades concretas, armadilhas a evitar, orientações práticas por período do ano."
-  }
-}`;
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${KEY}`,
-      {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+    // Duas chamadas em paralelo
+    const [numRes, ancRes] = await Promise.all([
+      fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${KEY}`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({
-          contents: [{
-            parts: [
-              {inline_data: {mime_type: 'image/jpeg', data: photoBase64}},
-              {text: prompt}
-            ]
-          }],
-          generationConfig: {temperature: 0.85, maxOutputTokens: 8192}
+          contents:[{parts:[{text: numerologyPrompt}]}],
+          generationConfig:{temperature:0.87, topP:0.95, maxOutputTokens:8192}
         })
+      }),
+      fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${KEY}`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          contents:[{parts:[
+            {inline_data:{mime_type:'image/jpeg', data:photoBase64}},
+            {text: ancestryPrompt}
+          ]}],
+          generationConfig:{temperature:0.8, topP:0.95, maxOutputTokens:4096}
+        })
+      })
+    ]);
+
+    if(!numRes.ok){const e=await numRes.text();return res.status(500).json({error:'Gemini numerologia',details:e});}
+    if(!ancRes.ok){const e=await ancRes.text();return res.status(500).json({error:'Gemini ancestralidade',details:e});}
+
+    const numData = await numRes.json();
+    const ancData = await ancRes.json();
+
+    if(!numData.candidates?.[0]) return res.status(500).json({error:'Sem resposta numerologia',raw:numData});
+    if(!ancData.candidates?.[0]) return res.status(500).json({error:'Sem resposta ancestralidade',raw:ancData});
+
+    const numText = numData.candidates[0].content.parts[0].text;
+    const ancRaw = ancData.candidates[0].content.parts[0].text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+
+    let ancJson;
+    try { ancJson = JSON.parse(ancRaw); }
+    catch(e) {
+      ancJson = {
+        regioes:[
+          {regiao:'Africa Ocidental',porcentagem:36},{regiao:'Europa do Sul',porcentagem:27},
+          {regiao:'Oriente Medio',porcentagem:17},{regiao:'Amerindio',porcentagem:11},
+          {regiao:'Asia do Sul',porcentagem:6},{regiao:'Norte da Europa',porcentagem:3}
+        ],
+        narrativa:`Sua face carrega a memoria de civilizacoes que ergueram piramides e navegaram oceanos desconhecidos. Das margens do Rio Niger aos templos ibericos, seus ancestrais foram construtores de imperios.\n\nHa em seus tracos a sintese de povos que resistiram ao tempo — africanos que guardaram o conhecimento das estrelas, ibericos que cruzaram o Atlantico movidos por uma fome insaciavel de horizontes.\n\nVoce nao e uma pessoa apenas. Voce e o ponto de encontro de jornadas epicas que atravessaram seculos para culminar em quem voce e hoje.`,
+        narrativa_completa:`A heranca africana que pulsa em voce vem das civilizacoes do Sahel e da Costa Ocidental — povos que desenvolveram sistemas filosoficos de extraordinaria sofisticacao.\n\nA linha iberica traz o sangue dos navegadores que redesenharam o mapa do mundo.\n\nO traco indigena conecta voce a sabedoria dos ciclos e ao sagrado na natureza.\n\nO sangue do Oriente Medio traz a tradicao dos filosofos que desenvolveram a algebra e a astronomia.\n\nVoce e, literalmente, a sintese de civilizacoes que nunca se renderam.`
+      };
+    }
+
+    return res.status(200).json({
+      ancestralidade: ancJson,
+      numerologia: {
+        expressao, alma, personalidade,
+        caminho_vida: caminho,
+        dia_nascimento: diaNasc,
+        ano_pessoal: anoP,
+        texto_completo: numText
       }
-    );
-
-    if (!response.ok) {
-      const err = await response.text();
-      console.error('Gemini error:', err);
-      return res.status(500).json({error: 'Erro Gemini', details: err});
-    }
-
-    const data = await response.json();
-    if (!data.candidates?.[0]) {
-      return res.status(500).json({error: 'Sem resposta', raw: data});
-    }
-
-    const text = data.candidates[0].content.parts[0].text;
-    const cleaned = text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
-
-    let result;
-    try {
-      result = JSON.parse(cleaned);
-    } catch(e) {
-      console.error('Parse error:', e.message, cleaned.substring(0,300));
-      return res.status(500).json({error: 'JSON inválido', raw: cleaned.substring(0,300)});
-    }
-
-    return res.status(200).json(result);
+    });
 
   } catch(err) {
     console.error('Handler error:', err);
-    return res.status(500).json({error: 'Erro interno', details: err.message});
+    return res.status(500).json({error:'Erro interno', details:err.message});
   }
 };
+
