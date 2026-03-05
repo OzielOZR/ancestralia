@@ -56,5 +56,31 @@ Gere a leitura numerológica completa seguindo exatamente a estrutura definida, 
     temperature: 0.85,
   });
 
-  return result.toUIMessageStreamResponse();
+  // Stream plain text as SSE: each chunk is sent as "data: <text>\n\n"
+  // so the client's manual SSE parser can read it directly.
+  const encoder = new TextEncoder();
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        for await (const chunk of result.textStream) {
+          const payload = `data: ${JSON.stringify({ type: "text-delta", delta: chunk })}\n\n`;
+          controller.enqueue(encoder.encode(payload));
+        }
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+      } catch (err) {
+        controller.error(err);
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    },
+  });
 }
