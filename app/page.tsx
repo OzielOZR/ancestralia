@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { DefaultChatTransport, readUIMessageStream, UIMessage } from "ai";
-import { useChat } from "@ai-sdk/react";
 import HeroSection from "@/components/hero-section";
 import NumerologyForm from "@/components/numerology-form";
 import SocialProofSection from "@/components/social-proof-section";

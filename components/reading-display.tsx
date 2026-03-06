@@ -27,7 +27,7 @@ export default function ReadingDisplay({
 
   function formatContent(text: string) {
     const lines = text.split("\n");
-    const elements: JSX.Element[] = [];
+    const elements: React.ReactNode[] = [];
     let key = 0;
 
     for (const line of lines) {
